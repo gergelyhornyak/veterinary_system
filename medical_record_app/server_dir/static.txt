@@ -1,0 +1,1 @@
+{"hospital_name":"Kisallatrendelő Felsőgöd","hospital_banner":"H-P 9-11, Szo 9-12","hospital_address":"2132 Göd, Bozóky Gyula tér 3","hospital_telnum":"3213123","hospital_mobile":"36207325478","vet_name":"Szamosi Judit","hospital_email":"allatorvosi@gmail.com"}

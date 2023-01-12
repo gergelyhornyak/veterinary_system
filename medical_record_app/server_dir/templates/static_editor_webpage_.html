@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>Rendelo adatok szerkeszto</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            * {
+            box-sizing: border-box;
+            }
+
+            /* Create two equal columns that floats next to each other */
+            .column {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            
+            }
+
+            /* Clear floats after the columns */
+            .row:after {
+            content: "";
+            display: table;
+            clear: both;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1>Rendelő Adatok Szerkesztő</h1>
+        <form id="myForm" method="POST" action="{{ url_for('submit_form') }}">
+
+            <label for="hosp_name">Rendelő neve:</label><br>
+            <input type="text" id="hosp_name" name="hosp_name"><br><br>
+
+            <label for="hosp_addr">Rendelő címe:</label><br>
+            <input type="text" id="hosp_addr" name="hosp_addr"><br><br>
+            
+            <label for="hosp_tel">Rendelő <b>telefon</b>száma:</label><br>
+            <input type="text" id="hosp_tel" name="hosp_tel"><br><br>
+
+            <label for="hosp_mobil">Rendelő <b>mobil</b>száma:</label><br>
+            <input type="text" id="hosp_mobil" name="hosp_mobil"><br><br>
+
+            <label for="hosp_banner">Rendelő reklámsora (pl. nyitvatartási idő):</label><br>
+            <input type="text" id="hosp_banner" name="hosp_banner"><br><br>
+
+            <label for="hosp_email">Rendelő email címe:</label><br>
+            <input type="email" id="hosp_email" name="hosp_email"><br><br>
+
+            <label for="vet_name">Állatorvos neve:</label><br>
+            <input type="text" id="vet_name" name="vet_name"><br><br>
+
+            <button type="submit" style="font-size: large;">Leadás</button>
+        </form>
+    </body>
+</html>

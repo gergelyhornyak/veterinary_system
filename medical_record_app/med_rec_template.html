@@ -1,0 +1,106 @@
+<!--"""-->
+<html>
+    <head>
+        <style>
+            * {
+            box-sizing: border-box;
+
+            }
+            /* Set additional styling options for the columns*/
+            .columnl {
+            float: left;
+            width: 50%;
+            }
+            
+            .columnr {
+            text-align: right;
+            float: right;
+            width: 50%;
+            }
+
+            .column {
+            float: left;
+            width: 40%;
+            }
+
+            .row:after {
+            content: '';
+            display: table;
+            clear: both;
+            }
+        </style>
+    </head>
+    <body>
+        <center><h1>{hospital_name}</h1>
+        <h2>Hétfő-Péntek</h2></center>
+
+        <div class="row">
+            <div class="columnl">
+                {hospital_address}
+            </div>
+            <div class="columnr">
+                {hospital_telephone} | {hospital_mobile}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="columnl" style="font-size: 12px;">
+                Nyomtatási adatok: {hospital_name}, {vet_name}
+            </div>
+            <div class="columnr">
+                Dátum: {med_chart_date}
+            </div>
+        </div>
+        <hr>
+        <br>
+        <center><h2>KÓRLAP</h2></center>
+        <br>
+
+        <div class="row">
+            <div class="column">
+                <p><u>Tulajdonos adatai:</u></p>
+                <p>{owner_name}</p>
+                <p>{owner_address}</p>
+                <p>{owner_mobile}</p>
+                <p>{owner_email}</p>
+            </div>
+            <div class="column" style="padding-left: 10px;border-left: solid black 1px;">
+                <p><u>Állat adatai:</u></p>
+                <p>Állat kód: {pet_id}</p>
+                <p>Név: {pet_name}</p>
+                <p>Faj: {pet_species}</p>
+                <p>Fajta: {pet_breed}</p>
+                <p>Szín: {pet_colour}</p>
+                <p>Születési d.: {pet_born}</p>
+                <p>Ivar: {pet_sex}</p>
+                <p>Útlevélszáma: {pet_passport_num}</p>
+                <p>útlevél Kiállításának dátuma: {pet_passport_date}</p>
+                <p>Mikrochip száma: {pet_chip_id}</p>
+                <p>Tömege: {pet_weight}</p>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <br>
+        <b>Dátum: {med_chart_date}<br>
+        Klinika, orvos: {hospital_name}, {vet_name}</b>
+        <br><br>
+        <b>Anamnesis</b>
+        <br>
+        {anamnesis}
+        <br>
+        <b>Symptoma</b>
+        <br>
+        {symptoms}
+        <br>
+        <b>Therapia</b>
+        <br>
+        {therapy}
+        <br>
+        <b>Megjegyzés</b>
+        <br>
+        {notes}
+        <br>
+    </body>
+</html>
+<!--"""-->
