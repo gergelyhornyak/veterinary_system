@@ -1,0 +1,617 @@
+/* General reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Page container */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Main content */
+main {
+  max-width: 90%;
+  margin: 0 auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+/* Search input */
+input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="tel"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="email"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+.sex-label {
+  gap: 1rem;
+  display: flex;
+}
+
+input[type="radio"] {
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="address"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="date"] {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="text"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+
+/* Patient list */
+ul {
+  list-style: none;
+}
+
+li {
+  background: #f5f5f5;
+  margin-bottom: 8px;
+  padding: 15px;
+  border-radius: 10px;
+  transition: border 0.2s ease;
+}
+
+li:hover {
+  border-left: 4px solid #5eb3da;
+}
+
+/* Patient details */
+li p {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+/* PET button */
+button {
+  padding: 8px 14px;
+  margin-left: 15px;
+  height: fit-content;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pet-name {
+  color: purple;
+}
+
+.no-pet-found {
+  padding: 10px;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:active {
+  background-color: #1f6391;
+}
+
+/* Pets section */
+h2 {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.transparent-textarea {
+  background: transparent;      /* Remove background */
+  border: none;                /* Remove border */
+  resize: none;                /* Disable resizing */
+  outline: none;               /* Remove focus outline */
+  overflow: hidden;            /* Hide scrollbar */
+  font: inherit;               /* Match surrounding text */
+  color: inherit;              /* Match surrounding text color */
+  padding: 0; 
+  line-height: normal;
+  width: 90%;
+  font-size: medium;
+  margin-top: 4px;
+}
+
+.owner-pet-container {
+  display: flex;
+  justify-content: left;
+  gap: 4%;
+  /* optional spacing between items */
+  transition: max-height 3s ease;
+}
+
+.form-container {
+  display: flex;
+  justify-content: left;
+  gap: 1rem;
+}
+
+.owner-info {
+  width: 35%;
+}
+
+.pet-button {
+  width: 10%;
+}
+
+.pet-info {
+  width: 66%;
+}
+
+li ul {
+  margin-top: 10px;
+  padding-left: 15px;
+}
+
+li ul li {
+  background: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.menu-button {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 18px;
+  margin: 2%;
+  font-weight: bold;
+  background-color: #2e7bcd;
+  /* blue button */
+  color: white;
+  font-size: 2vw;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  /* removes underline */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button-container {
+  justify-self: center;
+}
+
+.menu-button:hover {
+  background-color: #0056b3;
+  /* darker blue on hover */
+  text-decoration: none;
+  /* removes underline */
+}
+
+.menu-button:active {
+  background-color: #004085;
+  /* even darker when clicked */
+  text-decoration: none;
+  /* removes underline */
+}
+
+.radio-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Hide default radio button */
+.radio-group input[type="radio"] {
+  display: none;
+}
+
+/* Style labels as buttons */
+.radio-group label {
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+/* Hover effect */
+.radio-group label:hover {
+  background-color: #e0e0e0;
+}
+
+/* Active state when checked */
+.radio-group input[type="radio"]:checked+span {
+  color: blue;
+  font-weight: bold;
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* Layout */
+.container {
+  font-family: system-ui, sans-serif;
+  background: #fafafa;
+  color: #222;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.link {
+  font-size: 1rem;
+  color: #0070f3;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Search */
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.search-section label {
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+/* Patients */
+.patient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.patient-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.patient-info p {
+  margin: 0.25rem 0;
+}
+
+.actions {
+  margin-top: 0.5rem;
+}
+
+/* Pets */
+.pet-section {
+  margin-top: 1rem;
+}
+
+.pet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: inline-flex;
+  gap: 1rem;
+}
+
+.pet-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+}
+
+.pet-name {
+  font-weight: 600;
+}
+
+/* History */
+.history {
+  margin-top: 1rem;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-item {
+  border-bottom: 1px solid #eee;
+  padding: 5px;
+}
+
+/* Buttons */
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.button.primary {
+  background: #0070f3;
+  color: #fff;
+}
+
+.button.primary:hover {
+  background: #005ac1;
+}
+
+.button.secondary {
+  background: #eaeaea;
+  color: #333;
+}
+
+.button.secondary:hover {
+  background: #d5d5d5;
+}
+
+/* Misc */
+.no-results {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.row:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.columnl {
+  float: left;
+  width: 70%;
+}
+
+.columnr {
+  text-align: right;
+  float: right;
+  width: 30%;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 1% 0% 1.5% 0%;
+}
+
+/* --- Refinements for TreatmentPage --- */
+
+/* Pet info box */
+.pet-info-box {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.pet-info-box h3 {
+  margin: 10px 0;
+  color: #2c3e50;
+}
+
+.pet-status {
+  font-weight: bold;
+}
+
+.pet-status.neutralised {
+  color: green;
+}
+
+.pet-status.not-neutralised {
+  color: red;
+}
+
+/* Past record cards (reuse li but make them cleaner here) */
+.record-list {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.record-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.record-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.home-link {
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+/* Divider line */
+.divider {
+  margin: 25px 0;
+  border: none;
+  border-top: 2px solid #ccc;
+}
+
+/* Treatment form */
+.treatment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.treatment-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.treatment-form label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #2c3e50;
+}
+
+.treatment-form textarea {
+  resize: vertical;
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  font-size: 1rem;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.treatment-form textarea:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* Button row layout */
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.vaccination-list {
+  margin-top: 8px;
+}
+
+.vaccination-list ul {
+  margin: 6px 0 0 0;
+  padding-left: 15px;
+  list-style: disc;
+}
+
+.vaccination-item {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}

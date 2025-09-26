@@ -1,0 +1,98 @@
+services:
+  # -----------------------
+  # Backend (API server)
+  # -----------------------
+  
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      HOST: ${HOST}
+      PORT: 3000
+      DOMAIN: ${DOMAIN}
+      TZ: Europe/Budapest
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - internal
+
+  # -----------------------
+  # Frontend (UI server)
+  # -----------------------
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      HOST: ${HOST}
+      PORT: 3001
+      PUBLIC_API_URL: ${PUBLIC_API_URL}
+      PUBLIC_AUTH_URL: ${PUBLIC_AUTH_URL}
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3001:3001"
+    networks:
+      - internal
+
+  # -----------------------
+  # Database (MySQL)
+  # -----------------------
+
+  mongodb:
+    build: ./mongodb
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Budapest
+      HOST: ${HOST}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - internal
+
+  # -----------------------
+  # Reverse Proxy (NGINX)
+  # -----------------------
+
+  reverse-proxy:
+    build: ./reverse-proxy
+    container_name: reverse-proxy
+    restart: unless-stopped
+    volumes:
+      - ./reverse-proxy/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - internal
+
+
+# -----------------------a
+# Volumes & Networks
+# ----------------------- 
+
+volumes:
+  mongo_data:
+
+networks:
+  internal:
+    driver: bridge
