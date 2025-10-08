@@ -186,10 +186,7 @@ export default function ExportPDF() {
                             </p>
                             <p>Születési d.: {petData.birthday}</p>
                             <p>Ivar: {petData.sex}</p>
-                            <p>Útlevélszáma: PET-123123</p>
-                            <p>Útlevél dátuma: tegnap</p>
                             <p>Mikrochip száma: {petData.chipid}</p>
-                            <p>Tömege: {petData.weight} kg</p>
                         </div>
                     </div>
                     <hr style={{ "margin-bottom": "4px" }} />

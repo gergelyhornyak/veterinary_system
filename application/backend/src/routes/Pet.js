@@ -1,6 +1,6 @@
 import express from "express";
 import { Pet } from "../models/Pet.js";
-import { Patient } from "../models/Patient.js";
+import { Owner } from "../models/Owner.js";
 import { Record } from "../models/Record.js";
 
 const router = express.Router();
@@ -35,7 +35,7 @@ router.post("/register", async (req, res) => {
     }
 
     // 2️⃣ Check if username or email already exists
-    const existing = await Pet.findOne({ $or: [{ chipid } ] });
+    const existing = await Pet.findOne({ $and: [{ name }, { birthday }, { species }, { breed }, { sex }] });
     if (existing) {
       return res.status(400).json({ error: "Pet already exists with same chip number" });
     }
@@ -59,11 +59,11 @@ router.post("/register", async (req, res) => {
     await newPet.save();
 
     try {
-      const owner = await Patient.findOne({ uid });
+      const owner = await Owner.findOne({ uid });
       if (!owner) {
         throw new Error("Owner not found");
       }
-      owner.pet.push({ pid: uuid });
+      owner.pet.push(uuid);
       await owner.save();
     } catch (err) {
       console.log(err);
@@ -91,7 +91,5 @@ router.get("/:pid/record", async (req, res) => {
     res.status(401).json({message:"Not found pet record"});
   }
 })
-
-
 
 export default router;

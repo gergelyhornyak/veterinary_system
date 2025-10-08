@@ -9,8 +9,6 @@ export const petSchema = new mongoose.Schema({
   colour:      { type: String },
   birthday:    { type: Date },
   sex:         { type: String },
-  passport:    { type: mongoose.Schema.Types.Mixed },
-  weight:      { type: Number },
   record:      [{ type: String }]
 });
 

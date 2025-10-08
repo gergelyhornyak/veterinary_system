@@ -63,6 +63,10 @@ Therapia
 
 Megjegyzés
 
+Tünetek: (rangsorolva)
+- vezető tünet (jelezve: "ez és ez!" vagy piros színnel)
+- egyéb
+
 ## UX
 
 Kezdőoldalon egyből a kereső jelenik meg:
@@ -72,3 +76,10 @@ change URL to /rendelo
 
 change etc/hosts
 add IP - rendelo
+
+record types:
+
+vaccination,
+treatment,
+receipt,
+drug

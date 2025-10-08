@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
-import patientRoutes from "./routes/Patient.js";
+import ownerRoutes from "./routes/Owner.js";
 import petRoutes from "./routes/Pet.js";
 import recordRoutes from "./routes/Record.js";
 import drugRoutes from "./routes/Drug.js";
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/patient", patientRoutes);
+app.use("/owner", ownerRoutes);
 app.use("/pet", petRoutes);
 app.use("/drug", drugRoutes);
 app.use("/record", recordRoutes);

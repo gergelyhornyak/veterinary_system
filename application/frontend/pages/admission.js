@@ -9,8 +9,7 @@ export default function AdmissionPage() {
     const router = useRouter();
     const { name, address, email, mobile } = router.query;
 
-    const [lastname, setLastname] = useState("");
-    const [firstname, setFirstname] = useState("");
+    const [fullname, setFullName] = useState("");
     const [ownerMobile, setOwnerMobile] = useState("");
     const [ownerEmail, setOwnerEmail] = useState("");
     const [ownerAddress, setOwnerAddress] = useState("");
@@ -95,13 +94,7 @@ export default function AdmissionPage() {
 
     useEffect(() => {
         if (name) {
-            const parts = name.split(" ");
-            if (parts.length > 1) {
-                setLastname(parts[0]);
-                setFirstname(parts.slice(1).join(" "));
-            } else {
-                setLastname(parts[0]);
-            }
+            setFullName(name);
         }
         if (address) {
             setOwnerAddress(address);
@@ -139,7 +132,7 @@ export default function AdmissionPage() {
             sex: petSex,
             colour,
             weight,
-            birthDay: petBirthDay,
+            birthday: petBirthDay,
             neutralised: false
         }]);
         setPetName("");
@@ -154,13 +147,12 @@ export default function AdmissionPage() {
 
     const handleOwnerSubmit = async (e) => {
         e.preventDefault();
-        if (!lastname) return;
+        if (!fullname) return;
         setSaving1(true);
         setSaving2(true);
         try {
-            const ownerRes = await axios.post(`${process.env.API_URL}/patient/register`, {
-                lastname,
-                firstname: firstname ? [firstname] : [],
+            const ownerRes = await axios.post(`${process.env.API_URL}/owner/register`, {
+                fullname,
                 mobile: ownerMobile ? [ownerMobile] : [],
                 email: ownerEmail ? [ownerEmail] : [],
                 address: ownerAddress,
@@ -179,26 +171,24 @@ export default function AdmissionPage() {
                     breed: pet.breed,
                     sex: pet.sex,
                     colour: pet.colour,
-                    weight: pet.weight,
                     birthday: pet.birthday
                 }, { withCredentials: true });
                 console.debug(petRes);
             }
 
             // Reset all fields and cache
-            setLastname("");
-            setFirstname("");
+            setFullName("");
             setOwnerMobile("");
             setOwnerEmail("");
             setOwnerAddress("");
             setBirthDay("");
             setPetCache([]);
 
-            alert("Patient and pets successfully added!");
+            alert("Owner and pets successfully added!");
             router.push("/");
         } catch (err) {
-            console.error("Error adding patient and pets", err);
-            alert("Failed to add patient and pets");
+            console.error("Error adding owner and pets", err);
+            alert("Failed to add owner and pets");
         } finally {
             setSaving1(false);
             setSaving2(false);
@@ -207,22 +197,29 @@ export default function AdmissionPage() {
 
     return (
         <div>
-            <main>
+            <main style={{"margin":"0% 20%"}}>
                 <div>
-                    <Link href={`/`}><h2>Főoldal</h2></Link>
+                    <header className="header">
+                        <Link href={`/`}><h2>Főoldal</h2></Link>
                     
-                    <h1>Új tulajdonos felvétele</h1>
+                        <h1 className="title">Új tulajdonos felvétele</h1>
+                        <div style={{"text-align":"center","margin-bottom":"5%"}}>
+                            <p>1. állat(ok) hozzáadása</p>
+                            <p>2. tulajdonos hozzáadása</p>
+                        </div>
+                    </header>
                 </div>
                 <div className="form-container">
                     <div className="owner-form">
                         <form onSubmit={handleOwnerSubmit}>
                             <div>
-                                <label>Vezetéknév</label>
-                                <input type="text" value={lastname} onChange={e => setLastname(e.target.value)} required />
+                                <label><span style={{"color":"crimson"}}>*</span> Teljes név</label>
+                                <input type="text" value={fullname} onChange={e => setFullName(e.target.value)} required />
                             </div>
                             <div>
-                                <label>Keresztnév</label>
-                                <input type="text" value={firstname} onChange={e => setFirstname(e.target.value)} />
+                                <label><span style={{"color":"crimson"}}>*</span> Lakcím</label>
+                                <p>(ir.szám, város, utca, házszám)</p>
+                                <input type="text" value={ownerAddress} onChange={e => setOwnerAddress(e.target.value)} />
                             </div>
                             <div>
                                 <label>Telefonszám</label>
@@ -232,33 +229,23 @@ export default function AdmissionPage() {
                                 <label>Email</label>
                                 <input type="email" value={ownerEmail} onChange={e => setOwnerEmail(e.target.value)} />
                             </div>
-                            <div>
-                                <label>Lakcím</label>
-                                <p>(ir.szám, város, utca, házszám)</p>
-                                <input type="text" value={ownerAddress} onChange={e => setOwnerAddress(e.target.value)} />
-                            </div>
 
-                            <button type="submit" disabled={saving1}>{saving1 ? "Mentés..." : "Gazdi felvétel"}</button>
+                            <button type="submit" disabled={saving1}>{saving1 ? "Mentés..." : "Tulajdonos és állat felvétel"}</button>
                         </form>
                     </div>
 
                     <div className="pet-form">
                         <form onSubmit={handleAddPet}>
                             <div>
-                                <label>Állat neve</label>
+                                <label><span style={{"color":"crimson"}}>*</span> Állat neve</label>
                                 <input type="text" value={petName} onChange={e => setPetName(e.target.value)} required />
                             </div>
                             <div>
-                                <label>Chip-szám</label>
-                                <input
-                                type="text"
-                                value={chipid}
-                                onChange={handleChangeChipID}
-                                placeholder="Enter chip ID"
-                                />
+                                <label><span style={{"color":"crimson"}}>*</span> Születési Dátum</label>
+                                <input type="date" value={petBirthDay} onChange={e => setPetBirthDay(e.target.value)} />
                             </div>
                             <div>
-                                <label>Faj</label>
+                                <label><span style={{"color":"crimson"}}>*</span> Faj</label>
                                 <Select
                                     value={selectedSpecies}
                                     onChange={(option) => {
@@ -274,7 +261,7 @@ export default function AdmissionPage() {
                                 />
                             </div>
                             <div>
-                                <label>Fajta</label>
+                                <label><span style={{"color":"crimson"}}>*</span> Fajta</label>
                                 <Select
                                     defaultValue={[]}
                                     isMulti
@@ -289,7 +276,20 @@ export default function AdmissionPage() {
                                 />
                             </div>
                             <div>
-                                <label>Neme</label>
+                                <label><span style={{"color":"crimson"}}>*</span> Színe</label>
+                                <Select
+                                    defaultValue={[]}
+                                    isMulti
+                                    name="colour"
+                                    options={colourOptions}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    placeholder="..."
+                                    isDisabled={!selectedSpecies} 
+                                />
+                            </div>
+                            <div>
+                                <label><span style={{"color":"crimson"}}>*</span> Neme</label>
                                 <div className="radio-group">
                                     <label>
                                         <input
@@ -331,29 +331,17 @@ export default function AdmissionPage() {
                                 </div>
                             </div>
                             <div>
-                                <label>Színe</label>
-                                <Select
-                                    defaultValue={[]}
-                                    isMulti
-                                    name="colour"
-                                    options={colourOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    placeholder="..."
-                                    isDisabled={!selectedSpecies} 
-                                />
-                            </div>
-                            <div>
-                                <label>Súlya</label>
-                                <input type="number" value={weight} onChange={e => setWeight(e.target.value)} />
-                            </div>
-                            <div>
-                                <label>Születési Dátum</label>
-                                <input type="date" value={petBirthDay} onChange={e => setPetBirthDay(e.target.value)} />
-                            </div>
-                            <div>
                                 <label>Ivartalanítás Dátuma</label>
                                 <input type="date" value={petNeutraliseDate} onChange={e => setPetNeutraliseDate(e.target.value)} />
+                            </div>
+                            <div>
+                                <label>Chip-szám</label>
+                                <input
+                                type="text"
+                                value={chipid}
+                                onChange={handleChangeChipID}
+                                placeholder="Enter chip ID"
+                                />
                             </div>
                             <div>
                                 <label>Megjegyzés</label> <br />
@@ -368,7 +356,7 @@ export default function AdmissionPage() {
                                 <ul>
                                     {petCache.map((pet, index) => (
                                         <li key={index}>
-                                            {pet.name} ({pet.species})
+                                            {pet.name} ({pet.breed} {pet.species})
                                             <button onClick={() => handleRemovePet(index)}>Visszavon</button>
                                         </li>
                                     ))}

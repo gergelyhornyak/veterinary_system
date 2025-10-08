@@ -15,27 +15,25 @@ export default function TreatmentPage() {
     const [petData, setPetData] = useState(null);
     const [recordID, setRecordID] = useState("");
 
-    const [petName, setPetName] = useState("");
-    const [chipid, setChipid] = useState("");
-    const [species, setSpecies] = useState("");
-    const [breed, setBreed] = useState("");
-    const [petSex, setPetSex] = useState("male");
-    const [petNeutralised, setPetNeutralised] = useState("non-neutralised");
-    const [petNeutraliseDate, setPetNeutraliseDate] = useState("");
-
-    const [currentWeight, setCurrentWeight] = useState("");
     const [treatmentNote, setTreatmentNote] = useState("");
+    const [petTreatment, setPetTreatment] = useState("");
 
     const [petRecord, setPetRecord] = useState([]);
 
-    const [treatmentPlan, setTreatmentPlan] = useState([]);
-
     const [selectedDrug, setSelectedDrug] = useState([]);
+    const [selectedVaccine, setSelectedVaccine] = useState([]);
+
     const [drugOptions, setDrugOptions] = useState([]);
 
-    const [therapyPlan, setTherapyPlan] = useState("");
 
-    const [expanded, setExpanded] = useState(false);
+    const [petFood, setPetFood] = useState([]);
+    const [petMedicine, setPetMedicine] = useState([]);
+    const [petAnalysis, setPetAnalysis] = useState([]);
+    const [petHistory, setPetHistory] = useState([]);
+    const [petSuggestion, setPetSuggestion] = useState([]);
+    const [petSymptoms, setPetSymptoms] = useState([]);
+
+    const [activeFilter, setActiveFilter] = useState('all');
 
     useEffect(() => {
         setLoading(true);
@@ -61,7 +59,7 @@ export default function TreatmentPage() {
         if (uid) {
             setOwnerID(uid);
             const getOwnerData = async (uid) => {
-                const ownerRes = await axios.get(`${process.env.API_URL}/patient/${uid}/data`, { withCredentials: true });
+                const ownerRes = await axios.get(`${process.env.API_URL}/owner/${uid}/data`, { withCredentials: true });
 
                 setOwnerData(ownerRes.data);
             }
@@ -72,17 +70,17 @@ export default function TreatmentPage() {
 
     const saveTreatment = async () => {
         try {
-            console.debug("selectedDrug",selectedDrug);
             const recordRes = await axios.post(`${process.env.API_URL}/record/add`, {
                 pid: pid,
-                vaccination: selectedDrug,
-                treatment: treatmentPlan,
-                weight: currentWeight,
+                vaccination: selectedVaccine,
+                drug: selectedDrug,
+                treatment: petTreatment,
+                receipt: petMedicine,
                 note: treatmentNote
             }, { withCredentials: true });
             //const ownerUid = ownerRes.data.uid;
             const recordID = recordRes.data.rid;
-            console.debug("recordID",recordID);
+            console.debug("recordID", recordID);
             setRecordID(recordID);
             console.debug("record saved", recordRes);
         } catch (err) {
@@ -96,7 +94,7 @@ export default function TreatmentPage() {
         )
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString,form="long") => {
         const date = new Date(dateString);
 
         const year = date.getFullYear();
@@ -104,25 +102,29 @@ export default function TreatmentPage() {
         const day = String(date.getDate()).padStart(2, "0");
         const hours = String(date.getHours()).padStart(2, "0");
         const minutes = String(date.getMinutes()).padStart(2, "0");
-
+        if(form == "short"){
+            return `${year}. ${month}. ${day}.`;
+        }
         return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
-    }
-    const getDaysRemaining = (startDateString, duration) => {
-        const startDate = new Date(startDateString);
-        const today = new Date();
+    };
 
-        // Calculate the end date
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + duration);
+    const translate = (type) => {
+        if (type == "vaccination") {
+            return "oltás";
+        } else if (type == "treatment") {
+            return "kezelés";
+        } else if (type == "drug") {
+            return "gyógyszerezés";
+        } else if (type == "receipt") {
+            return "recept";
+        }
+    };
 
-        // Calculate difference in milliseconds
-        const diffMs = endDate - today;
 
-        // Convert milliseconds to days
-        const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-        return remainingDays >= 0 ? remainingDays : 0; // return 0 if already passed
-    }
+    const filterRecords = (records) => {
+        if (activeFilter === 'all') return records;
+        return records.filter(record => record.type === activeFilter);
+    };
 
     if (loading) return <></>;
 
@@ -130,58 +132,110 @@ export default function TreatmentPage() {
         <div className="page">
             <main>
                 <header className="header">
-                    <Link href={`/`}>
-                        <p className="home-link">← Főoldal</p>
-                    </Link>
-                    <h1>Állat kezelése</h1>
+                    <Link href={`/`}><h2>Főoldal</h2></Link>
+                    <h1 className="title">Beavatkozás</h1>
                 </header>
 
                 {petData ? (
-                    <section className="pet-info">
+                    <section className="pet-info" style={{"width":"90%"}}>
                         <p>
-                            <strong>Tulajdonos:</strong> {ownerData.lastname} <br />
-                            <strong>Kiskedvenc:</strong> {petData.name}, {petData.breed} {petData.species}, {petData.colour}, {petData.sex},{" "}
+                            <strong>Tulajdonos:</strong> {ownerData.fullname} <br />
+                            <strong>Állat:</strong> {petData.name}, {petData.breed} {petData.species} - {petData.colour}, {petData.sex}, {" "}
                             <span className={petData?.neutralised ? "neutralised" : "not-neutralised"}>
                                 {petData?.neutralised ? "ivartalanított" : "ivaros"}
                             </span>
+                            {" "}(szül.: {formatDate(petData.birthday,"short")})
                         </p>
-                        <h3>Múltbéli kezelései:</h3>
-                        <ul className="record-list">
-                            {petRecord.map((r) => (
-                                <li key={r.rid} className="record-card">
+                        <h3>Előző beavatkozások:</h3>
+                        <div className="filter-buttons">
+                            <button
+                                className={`filter-button ${activeFilter === 'all' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('all')}>
+                                Összes
+                            </button>
+                            <button
+                                className={`filter-button ${activeFilter === 'vaccination' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('vaccination')}>
+                                Oltások
+                            </button>
+                            <button
+                                className={`filter-button ${activeFilter === 'drug' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('drug')}>
+                                Gyógyszerezés
+                            </button>
+                            <button
+                                className={`filter-button ${activeFilter === 'receipt' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('receipt')}>
+                                Recept
+                            </button>
+                            <button
+                                className={`filter-button ${activeFilter === 'treatment' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('treatment')}>
+                                Kezelés
+                            </button>
+                        </div>
+                        <ul className="record-list" style={{"display":"flex","flex-wrap":"wrap","gap":"5px"}}>
+                            {filterRecords(petRecord).map((r) => (
+                                <li key={r.rid} className="record-card" style={{"min-width":"45%"}}>
                                     <details>
                                         <summary>
-                                        <strong>{formatDate(r.date)}</strong> <br />
-                                        {r.note}
+                                            <strong>{formatDate(r.date)}</strong> <br />
+                                            {translate(r.type)}
                                         </summary>
-                                            <div className="record-extra">
-                                                {r.vaccination && r.vaccination.length > 0 && (
-                                                    <div className="vaccination-list">
-                                                        <strong>Oltások:</strong>
-                                                        <ul>
-                                                            {r.vaccination.map((v, idx) => (
-                                                                <li key={idx} className="vaccination-item">
-                                                                    <p>{v.value}</p>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                        <div className="record-extra">
+                                            {r.type == "vaccination" && r.vaccination.length > 0 && (
+                                                <div className="vaccination-list">
+                                                    <strong>Oltások:</strong>
+                                                    <ul>
+                                                        {r.vaccination.map((v, idx) => (
+                                                            <li key={idx} className="vaccination-item">
+                                                                <p>{v.value}</p>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
 
-                                                {r.treatment && r.treatment.length > 0 && (
-                                                    <div className="vaccination-list">
-                                                        <strong>Kezelések:</strong>
-                                                        <ul>
-                                                            {r.treatment.map((v, idx) => (
-                                                                <li key={idx} className="vaccination-item">
-                                                                    {v.notes && <p>Megjegyzés: {v.notes}</p>}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        
+                                            {r.type == "treatment" && r.treatment.length > 0 && (
+                                                <div className="vaccination-list">
+                                                    <strong>Kezelések:</strong>
+                                                    <ul>
+                                                        {r.treatment.map((v, idx) => (
+                                                            <li key={idx} className="vaccination-item">
+                                                                <p>{v.notes}</p>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {r.type == "drug" && r.drug.length > 0 && (
+                                                <div className="vaccination-list">
+                                                    <strong>Gyógyszerezés:</strong>
+                                                    <ul>
+                                                        {r.drug.map((v, idx) => (
+                                                            <li key={idx} className="vaccination-item">
+                                                                <p>{v.value} ({v.note})</p>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {r.type == "receipt" && r.receipt.length > 0 && (
+                                                <div className="vaccination-list">
+                                                    <strong>Receptek:</strong>
+                                                    <ul>
+                                                        {r.receipt.map((v, idx) => (
+                                                            <li key={idx} className="vaccination-item">
+                                                                <p>{v.value}</p>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                        </div>
                                     </details>
                                 </li>
                             ))}
@@ -199,16 +253,66 @@ export default function TreatmentPage() {
 
                 <section className="form-section">
                     <form onSubmit={saveTreatment} className="treatment-form">
-                        <div className="form-group">
-                            <label>Kezelés terv</label>
-                            <textarea
-                                value={treatmentPlan}
-                                onChange={(e) => setTreatmentPlan(e.target.value)}
-                            />
-                        </div>
+                        {activeFilter == "treatment" &&
+                            <>
+                                <div className="form-group">
+                                    <label>Kórelőzmény</label>
+                                    <textarea
+                                        value={petHistory}
+                                        onChange={(e) => setPetHistory(e.target.value)}
+                                    />
+                                </div>
 
+                                <div className="form-group">
+                                    <label>Tünetek</label>
+                                    <textarea
+                                        value={petSymptoms}
+                                        onChange={(e) => setPetSymptoms(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Vizsgálat</label>
+                                    <textarea
+                                        value={petAnalysis}
+                                        onChange={(e) => setPetAnalysis(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Kezelés</label>
+                                    <textarea
+                                        value={petTreatment}
+                                        onChange={(e) => setPetTreatment(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Javaslat</label>
+                                    <textarea
+                                        value={petSuggestion}
+                                        onChange={(e) => setPetSuggestion(e.target.value)}
+                                    />
+                                </div>
+                            </>
+                        }
+                        {activeFilter == "vaccination" &&
+                            <>
+                                <div className="form-group">
+                                    <label>Oltások</label>
+                                    <Select
+                                        value={selectedVaccine}
+                                        onChange={setSelectedVaccine}
+                                        options={drugOptions}
+                                        classNamePrefix="select"
+                                        placeholder="Válasszon..."
+                                        isMulti
+                                    />
+                                </div>
+                            </>
+                        }
                         <div className="form-group">
-                            <label>Oltások</label>
+                            <label>Gyógyszerek</label>
                             <Select
                                 value={selectedDrug}
                                 onChange={setSelectedDrug}
@@ -219,21 +323,40 @@ export default function TreatmentPage() {
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label>Jelenlegi súlya (kg)</label>
-                            <input type="number"
-                                value={currentWeight}
-                                onChange={(e) => setCurrentWeight(e.target.value)}
-                            />
+                        <div className="selected-drugs-section">
+                            <h3>Kiválasztott gyógyszerek:</h3>
+                            {selectedDrug.map((drug, index) => (
+                                <div key={index} className="selected-drug">
+                                    <label>{drug.label}</label>
+                                    <input
+                                        style={{ "margin": "1%", "font-size": "20px" }}
+                                        placeholder="javallat"
+                                        onChange={(e) => {
+                                            // Handle textarea change for each drug if needed
+                                        }}
+                                    />
+                                </div>
+                            ))}
                         </div>
+                        {activeFilter == "receipt" &&
+                            <>
+                                <div className="form-group">
+                                    <label>Gyógyszerek (külsős)</label>
+                                    <textarea
+                                        value={petMedicine}
+                                        onChange={(e) => setPetMedicine(e.target.value)}
+                                    />
+                                </div>
 
-                        <div className="form-group">
-                            <label>Kúra / Terápia</label>
-                            <textarea
-                                value={therapyPlan}
-                                onChange={(e) => setTherapyPlan(e.target.value)}
-                            />
-                        </div>
+                                <div className="form-group">
+                                    <label>Gyógytápok</label>
+                                    <textarea
+                                        value={petFood}
+                                        onChange={(e) => setPetFood(e.target.value)}
+                                    />
+                                </div>
+                            </>
+                        }
 
                         <div className="form-group">
                             <label>Megjegyzés</label>
@@ -245,10 +368,10 @@ export default function TreatmentPage() {
 
                         <div className="button-row">
                             <button className="button primary" onClick={() => submitTreatment()}>
-                                Kórlap készítés
+                                Kórlap készítés (és beavatkozás mentése)
                             </button>
                             <button className="button secondary" onClick={() => saveTreatment()}>
-                                Kezelés lezárása
+                                Beavatkozás mentése és lezárása
                             </button>
                         </div>
                     </form>

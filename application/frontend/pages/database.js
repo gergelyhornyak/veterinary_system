@@ -8,8 +8,8 @@ export default function Database() {
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
-    const [patients, setPatients] = useState([]);
-    const [pets, setPets] = useState([]);
+    const [listOfPatients, setListOfPatients] = useState([]);
+    const [listOfPets, setListOfPets] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [petSearchTerm, setPetSearchTerm] = useState("");
     const [selectedPetOwner, setSelectedPetOwner] = useState(null);
@@ -18,20 +18,18 @@ export default function Database() {
     const [petDataLoading, setPetDataLoading] = useState(false); // store fetched data
 
     useEffect(() => {
-
         const fetchPatients = async () => {
             setLoading(true);
             try {
                 const [patientRes, petRes] = await Promise.all([
-                    axios.get(`${process.env.API_URL}/patient/all`, { withCredentials: true }),
+                    axios.get(`${process.env.API_URL}/owner/all`, { withCredentials: true }),
                     axios.get(`${process.env.API_URL}/pet/all`, { withCredentials: true })
                 ]);
                 console.debug(patientRes.data,petRes.data);
-                setPatients(patientRes.data);
-                setPets(petRes.data);
-
+                setListOfPatients(patientRes.data);
+                setListOfPets(petRes.data);
             } catch (err) {
-                console.error("Error fetching data:", err);
+                console.error("Error fetching pets and owners data:", err);
             } finally {
                 setLoading(false);
             }
@@ -39,20 +37,25 @@ export default function Database() {
         fetchPatients();
     }, []);
 
-    const filteredPatients = patients.filter((p) => {
+    const filteredPatients = listOfPatients.filter((p) => {
         const term = searchTerm.toLowerCase().trim();
         if (!term) return true;
 
-        // Split search by whitespace to support "lastname firstname"
-        const parts = term.split(/\s+/);
-        const lastPart = parts[0] || "";
-        const firstPart = parts[1] || "";
-
-        const lastnameMatch = p.lastname.toLowerCase().startsWith(lastPart);
-        const firstnameMatch = firstPart ? p.firstname?.some((fn) => fn.toLowerCase().startsWith(firstPart)) : true;
-
-        return lastnameMatch && firstnameMatch;
+        const fullNameMatch = p.fullname.toLowerCase().includes(term);        
+        return fullNameMatch;
     });
+
+    const translate = (type) => {
+        if (type == "vaccination") {
+            return "oltás";
+        } else if (type == "treatment") {
+            return "kezelés";
+        } else if (type == "drug") {
+            return "gyógyszerezés";
+        } else if (type == "receipt") {
+            return "recept";
+        }
+    };
 
     const getAgeString = (birthDateString) => {
         const birthDate = new Date(birthDateString);
@@ -103,14 +106,14 @@ export default function Database() {
     };
 
     const getPetsForOwner = (ownerUid) => {
-        const owner = patients.find(p => p.uid === ownerUid);
+        const owner = listOfPatients.find(p => p.uid === ownerUid);
         if (!owner || !owner.pet || owner.pet.length === 0) return [];
         const petIds = owner.pet;
-        return pets.filter(pet => petIds.includes(pet.pid));
+        return listOfPets.filter(pet => petIds.includes(pet.pid));
     };
 
     if (loading) return <></>;
-    if (!patients) return (
+    if (!listOfPatients) return (
         <>
             <p>Patients not found or you do not have access.</p>
             <Link href="/"><p>Go back to homepage</p></Link>
@@ -122,9 +125,7 @@ export default function Database() {
         <div className="container">
             <main className="main">
                 <header className="header">
-                    <Link href={`/`}>
-                        <h2 className="link">Főoldal</h2>
-                    </Link>
+                    <Link href={`/`}><h2>Főoldal</h2></Link>
                     <h1 className="title">Nyilvántartás</h1>
                 </header>
 
@@ -134,7 +135,7 @@ export default function Database() {
                         <input
                             type="text"
                             className="input"
-                            placeholder="Vezetéknév keresztnév"
+                            placeholder="Teljes neve"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -149,17 +150,22 @@ export default function Database() {
                             <li key={p.uid} className="patient-card">
                                 <div className="patient-info">
                                     <p>
-                                        <strong>Neve:</strong> {p.lastname}, {p.firstname.join(" ")}
+                                        <strong>Név:</strong> {p.fullname}
                                     </p>
-                                    {p.mobile?.length > 0 && (
+                                    {p.address && (
                                         <p>
-                                            <strong>Tel.szám:</strong> {p.mobile.join(", ")}
+                                            <strong>Lakcím:</strong> {p.address}
                                         </p>
                                     )}
-                                    {p.email?.length > 0 && (
+                                    {p.debt > 0 && (
                                         <p>
-                                            <strong>Email:</strong> {p.email}
+                                            <strong style={{"color":"crimson"}}>Tartozás:</strong> {p.debt} Ft 
+                                            <button className="button" 
+                                            onClick={() => {router.push(`/pay-debt?uid=${encodeURIComponent(`${p.uid}`)}`)}}>
+                                                kifizetés
+                                            </button>
                                         </p>
+
                                     )}
                                 </div>
                                 <div className="actions">
@@ -184,12 +190,11 @@ export default function Database() {
                                                     {getPetsForOwner(p.uid).map((pet) => (
                                                         <li key={pet.pid} className="pet-card">
                                                             <div>
-                                                                <span className="pet-name">{pet.name}</span> – {getAgeString(pet.birth)}
+                                                                <span className="pet-name">{pet.name}</span> – {getAgeString(pet.birthday)}
                                                             </div>
                                                             <div>
-                                                                {pet.species} – {pet.breed} – {pet.sex}
+                                                                {pet.species} - {pet.breed} - {pet.sex}
                                                             </div>
-                                                            <div>{pet?.weight} kg</div>
                                                             <button
                                                                 className="button secondary"
                                                                 onClick={() => {
@@ -213,7 +218,7 @@ export default function Database() {
                                                     onClick={() =>
                                                         router.push(
                                                             `/admission?name=${encodeURIComponent(
-                                                                `${p.lastname} ${p.firstname.join(" ")}`
+                                                                `${p.fullname}`
                                                             )}&address=${encodeURIComponent(p?.address)}&email=${encodeURIComponent(
                                                                 p?.email
                                                             )}&mobile=${encodeURIComponent(p?.mobile[0])}`
@@ -231,7 +236,7 @@ export default function Database() {
                                                     onClick={() =>
                                                         router.push(
                                                             `/admission?name=${encodeURIComponent(
-                                                                `${p.lastname} ${p.firstname.join(" ")}`
+                                                                `${p.fullname}`
                                                             )}`
                                                         )
                                                     }
@@ -249,10 +254,8 @@ export default function Database() {
                                                         <li key={record.rid} className="history-item">
                                                             <details>
                                                                 <summary>
-                                                                <div>
                                                                     <strong>Dátum:</strong> {new Date(record.date).toLocaleDateString("hu-HU")}
-                                                                </div>
-                                                                <div>{record.note}</div>
+                                                                <div>{translate(record.type)}</div>
                                                                 </summary>
                                                                 
                                                                 {record.vaccination?.length > 0 && (
@@ -260,7 +263,7 @@ export default function Database() {
                                                                     <strong>Oltások:</strong>{" "}
                                                                     {record.vaccination.map((vax, idx) => (
                                                                         <div key={idx}>
-                                                                            {vax.label}<br />
+                                                                            {vax.value}<br />
                                                                         </div>
                                                                     ))}
                                                                 </div>
@@ -270,6 +273,22 @@ export default function Database() {
                                                                         <strong>Kezelés:</strong>{" "}
                                                                         {record.treatment.map((treat, idx) => (
                                                                             <div key={idx}>{treat.notes}</div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                                {record.drug?.length > 0 && (
+                                                                    <div>
+                                                                        <strong>Gyógyszerezés:</strong>{" "}
+                                                                        {record.drug.map((treat, idx) => (
+                                                                            <div key={idx}>{treat.value}</div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                                {record.receipt?.length > 0 && (
+                                                                    <div>
+                                                                        <strong>Receptek:</strong>{" "}
+                                                                        {record.receipt.map((treat, idx) => (
+                                                                            <div key={idx}>{treat.value}</div>
                                                                         ))}
                                                                     </div>
                                                                 )}
