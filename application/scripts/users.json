@@ -1,0 +1,44 @@
+[
+  {
+    "username": "admin",
+    "nickname": "admin",
+    "email": "admin.zf@gmail.com",
+    "password": "admin"
+  },
+  {
+    "username": "James McRoll",
+    "nickname": "james",
+    "email": "james@example.com",
+    "password": "james123"
+  },
+  {
+    "username": "Ritha Othello",
+    "nickname": "ritha",
+    "email": "ritha@example.com",
+    "password": "ritha123"
+  },
+  {
+    "username": "Jordan Walters",
+    "nickname": "jordan",
+    "email": "jordan@example.com",
+    "password": "jordan123"
+  },
+  {
+    "username": "Karina Blankenship",
+    "nickname": "karina",
+    "email": "karina@example.com",
+    "password": "karina123"
+  },
+  {
+    "username": "Lazaro Steele",
+    "nickname": "lazaro",
+    "email": "lazaro@example.com",
+    "password": "lazaro123"
+  },
+  {
+    "username": "Berta Hirsch",
+    "nickname": "berta",
+    "email": "berta@example.com",
+    "password": "berta123"
+  }
+]

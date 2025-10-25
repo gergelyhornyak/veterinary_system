@@ -83,3 +83,21 @@ vaccination,
 treatment,
 receipt,
 drug
+
+## Cases
+
+1. new owner - new pet
+
+create new owner - new uuid
+create new pet
+assign pet to owner
+
+2. existing owner - new pet
+
+create new pet - new uuid
+assign to assigned owner
+
+3. existing owner - existing pet - switch owner
+
+assign to assigned new owner
+remove from assigned old owner

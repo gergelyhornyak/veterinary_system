@@ -25,7 +25,7 @@ export default function Database() {
                     axios.get(`${process.env.API_URL}/owner/all`, { withCredentials: true }),
                     axios.get(`${process.env.API_URL}/pet/all`, { withCredentials: true })
                 ]);
-                console.debug(patientRes.data,petRes.data);
+                //console.debug(patientRes.data,petRes.data);
                 setListOfPatients(patientRes.data);
                 setListOfPets(petRes.data);
             } catch (err) {
@@ -96,7 +96,7 @@ export default function Database() {
             setPetData(null);
             //setSelectedPet(pid);
             const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/record`, { withCredentials: true });
-            console.debug(petRes.data);
+            //console.debug(petRes.data);
             setPetData(petRes.data);
         } catch (err) {
             console.error("Error fetching pet data:", err);
@@ -150,7 +150,11 @@ export default function Database() {
                             <li key={p.uid} className="patient-card">
                                 <div className="patient-info">
                                     <p>
-                                        <strong>Név:</strong> {p.fullname}
+                                        <strong>Név:</strong> {p.fullname}  
+                                        <button className="button" 
+                                        onClick={() => {router.push(`/profile-editor?uid=${encodeURIComponent(`${p.uid}`)}`)}}>
+                                                Szerkesztés
+                                        </button>
                                     </p>
                                     {p.address && (
                                         <p>
@@ -162,7 +166,7 @@ export default function Database() {
                                             <strong style={{"color":"crimson"}}>Tartozás:</strong> {p.debt} Ft 
                                             <button className="button" 
                                             onClick={() => {router.push(`/pay-debt?uid=${encodeURIComponent(`${p.uid}`)}`)}}>
-                                                kifizetés
+                                                Kifizetés
                                             </button>
                                         </p>
 
@@ -190,10 +194,11 @@ export default function Database() {
                                                     {getPetsForOwner(p.uid).map((pet) => (
                                                         <li key={pet.pid} className="pet-card">
                                                             <div>
-                                                                <span className="pet-name">{pet.name}</span> – {getAgeString(pet.birthday)}
+                                                                <span>[{pet.alive ? "Élő" : "Elhunyt"}] </span>
+                                                                <span className="pet-name">{pet.name}</span> - {getAgeString(pet.birthday)}
                                                             </div>
                                                             <div>
-                                                                {pet.species} - {pet.breed} - {pet.sex}
+                                                                {pet.species} - {pet.breed.join(" ")} - {pet.sex}
                                                             </div>
                                                             <button
                                                                 className="button secondary"
@@ -217,11 +222,7 @@ export default function Database() {
                                                 <button
                                                     onClick={() =>
                                                         router.push(
-                                                            `/admission?name=${encodeURIComponent(
-                                                                `${p.fullname}`
-                                                            )}&address=${encodeURIComponent(p?.address)}&email=${encodeURIComponent(
-                                                                p?.email
-                                                            )}&mobile=${encodeURIComponent(p?.mobile[0])}`
+                                                           `/admission?uid=${encodeURIComponent(`${p.uid}`)}&name=${encodeURIComponent(`${p.fullname}`)}&address=${encodeURIComponent(`${p.address}`)}&email=${encodeURIComponent(`${p.email}`)}&mobile=${encodeURIComponent(`${p.mobile}`)}`
                                                         )
                                                     }
                                                 >
@@ -235,9 +236,7 @@ export default function Database() {
                                                     className="button primary"
                                                     onClick={() =>
                                                         router.push(
-                                                            `/admission?name=${encodeURIComponent(
-                                                                `${p.fullname}`
-                                                            )}`
+                                                            `/admission?uid=${encodeURIComponent(`${p.uid}`)}&name=${encodeURIComponent(`${p.fullname}`)}&address=${encodeURIComponent(`${p.address}`)}&email=${encodeURIComponent(`${p.email}`)}&mobile=${encodeURIComponent(`${p.mobile}`)}`
                                                         )
                                                     }
                                                 >

@@ -1,0 +1,2 @@
+#sudo docker compose down -v && yes | sudo docker volume prune && sudo docker volume ls && sudo docker ps -a && sudo docker compose build && sudo docker compose up
+sudo docker compose down && sudo docker compose build && sudo docker compose up

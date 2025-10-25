@@ -5,7 +5,7 @@ module.exports = {
     AUTH_URL: process.env.PUBLIC_AUTH_URL
   },
   publicRuntimeConfig: {
-    HMR_HOST: '192.168.0.19',
+    HMR_HOST: '192.168.0.25',
   },
   onDemandEntries: {
     // keep pages in memory longer

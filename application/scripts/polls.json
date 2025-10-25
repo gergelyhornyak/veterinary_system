@@ -1,0 +1,10 @@
+[
+  {
+      "question": "Which realm shall we journey to next?",
+      "type": "single-choice",
+      "options": ["Forest of Shadows", "Crystal Mountains", "Sunken Ruins"],
+      "pollster": "Dungeon Master",
+      "gid": "",
+      "creatoruid": ""
+  }
+]

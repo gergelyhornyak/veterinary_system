@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, DragEvent, ChangeEvent } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Select from 'react-select';
@@ -34,6 +34,11 @@ export default function TreatmentPage() {
     const [petSymptoms, setPetSymptoms] = useState([]);
 
     const [activeFilter, setActiveFilter] = useState('all');
+
+    const [preview, setPreview] = useState(null);
+    const [file, setFile] = useState(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -94,7 +99,7 @@ export default function TreatmentPage() {
         )
     };
 
-    const formatDate = (dateString,form="long") => {
+    const formatDate = (dateString, form = "long") => {
         const date = new Date(dateString);
 
         const year = date.getFullYear();
@@ -102,7 +107,7 @@ export default function TreatmentPage() {
         const day = String(date.getDate()).padStart(2, "0");
         const hours = String(date.getHours()).padStart(2, "0");
         const minutes = String(date.getMinutes()).padStart(2, "0");
-        if(form == "short"){
+        if (form == "short") {
             return `${year}. ${month}. ${day}.`;
         }
         return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
@@ -126,6 +131,55 @@ export default function TreatmentPage() {
         return records.filter(record => record.type === activeFilter);
     };
 
+    const handleChange = (e) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) handleFile(selectedFile);
+    };
+
+    const handleFile = (selectedFile) => {
+        if (!selectedFile.type.startsWith("image/")) {
+            alert("Please upload an image file.");
+            return;
+        }
+        setFile(selectedFile);
+        setPreview(URL.createObjectURL(selectedFile));
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => setIsDragging(false);
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const droppedFile = e.dataTransfer.files?.[0];
+        if (droppedFile) handleFile(droppedFile);
+    };
+
+    const handleUpload = async () => {
+        if (!file) return;
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            alert(`Upload successful: ${data.url}`);
+        } catch (err) {
+            console.error(err);
+            alert("Upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
+
     if (loading) return <></>;
 
     return (
@@ -137,14 +191,14 @@ export default function TreatmentPage() {
                 </header>
 
                 {petData ? (
-                    <section className="pet-info" style={{"width":"90%"}}>
+                    <section className="pet-info" style={{ "width": "90%" }}>
                         <p>
                             <strong>Tulajdonos:</strong> {ownerData.fullname} <br />
                             <strong>Állat:</strong> {petData.name}, {petData.breed} {petData.species} - {petData.colour}, {petData.sex}, {" "}
                             <span className={petData?.neutralised ? "neutralised" : "not-neutralised"}>
                                 {petData?.neutralised ? "ivartalanított" : "ivaros"}
                             </span>
-                            {" "}(szül.: {formatDate(petData.birthday,"short")})
+                            {" "}(szül.: {formatDate(petData.birthday, "short")})
                         </p>
                         <h3>Előző beavatkozások:</h3>
                         <div className="filter-buttons">
@@ -174,9 +228,9 @@ export default function TreatmentPage() {
                                 Kezelés
                             </button>
                         </div>
-                        <ul className="record-list" style={{"display":"flex","flex-wrap":"wrap","gap":"5px"}}>
+                        <ul className="record-list" style={{ "display": "flex", "flex-wrap": "wrap", "gap": "5px" }}>
                             {filterRecords(petRecord).map((r) => (
-                                <li key={r.rid} className="record-card" style={{"min-width":"45%"}}>
+                                <li key={r.rid} className="record-card" style={{ "min-width": "45%" }}>
                                     <details>
                                         <summary>
                                             <strong>{formatDate(r.date)}</strong> <br />
@@ -280,6 +334,44 @@ export default function TreatmentPage() {
                                 </div>
 
                                 <div className="form-group">
+                                    <div
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                    >
+                                        <label className="text-gray-500 text-center">
+                                            {preview ? (
+                                                <img
+                                                    src={preview}
+                                                    alt="Preview"
+                                                    className="w-full h-full object-cover rounded-2xl"
+                                                />
+                                            ) : (
+                                                <>
+                                                    <p>Drag & Drop your image here</p>
+                                                    <p className="text-sm">or click to browse</p>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={handleChange}
+                                                    />
+                                                </>
+                                            )}
+                                        </label>
+                                    </div>
+
+                                    {preview && (
+                                        <button
+                                            onClick={handleUpload}
+                                            disabled={uploading}
+                                        >
+                                            {uploading ? "Uploading..." : "Upload"}
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="form-group">
                                     <label>Kezelés</label>
                                     <textarea
                                         value={petTreatment}
@@ -377,6 +469,6 @@ export default function TreatmentPage() {
                     </form>
                 </section>
             </main>
-        </div>
+        </div >
     );
 }

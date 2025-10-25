@@ -9,6 +9,8 @@ COPY package*.json ./
 RUN npm install --verbose
 RUN npm install jspdf html2canvas --verbose
 RUN npm install react-textarea-autosize --verbose
+RUN npm install react-chartjs-2 --verbose
+RUN npm install chart.js --verbose
 
 # Copy app source
 COPY . .

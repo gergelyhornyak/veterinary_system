@@ -1,0 +1,7 @@
+# Caddyfile
+
+# For local development (no domain, self-signed)
+https://localhost {
+    tls internal
+    reverse_proxy frontend:3000
+}

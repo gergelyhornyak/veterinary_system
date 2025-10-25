@@ -1,14 +1,34 @@
 import express from "express";
 import { Owner } from "../models/Owner.js";
+import { Pet } from "../models/Pet.js";
 
 const router = express.Router();
 
 router.get("/", (req, res) => res.json({ status: "online", service: "backend" }));
 router.get("/all", async (req, res) => {
-
-  const patients = await Owner.find({});
-  res.json(patients);
+  const owners = await Owner.find({});
+  res.json(owners);
 });
+
+router.get("/:uid/exist", async (req, res) => {
+  const { uid } = req.params;
+  const owner = await Owner.findOne({uid:uid});
+  if(owner) {
+    return res.status(201).json({ message: "Owner exists", uid: uid });
+  }
+});
+
+router.get("/:uid/data", async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const owner = await Owner.findOne({ uid: uid });
+    if (!owner) return res.status(401).json("Owner not found");
+    res.status(200).json(owner);
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ message: "Not found owner data" });
+  }
+})
 
 router.post("/register", async (req, res) => {
   try {
@@ -18,7 +38,7 @@ router.post("/register", async (req, res) => {
     }
 
     // 2️⃣ Check if username or email already exists
-    const existing = await Owner.findOne({ $and: [{ fullname }, {address}] }); // decide primary identifiers
+    const existing = await Owner.findOne({ $and: [{ fullname }, { address }] }); // decide primary identifiers
     if (existing) {
       //return res.status(400).json({ error: "Patient already exists" });
       return res.status(201).json({ message: "Owner updated successfully", uid: existing.uid });
@@ -47,60 +67,39 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/:uid/data", async (req, res) => {
+router.post("/:uid/update", async (req, res) => {
   try {
     const { uid } = req.params;
-    const owner = await Owner.findOne({uid:uid});
-    if (!owner) return res.status(401).json("Owner not found");
-    res.status(200).json(owner);
-  } catch (err) {
-    console.error(err);
-    res.status(401).json({message:"Not found owner data"});
-  }
-})
-
-router.post("/:uid/update/fullname", async (req, res) => {
-  try {
-    const { uid } = req.params;
-    const { fullname } = req.body;
-    const owner = await Owner.findOne({uid:uid});
+    const { fullname, address, mobile, email } = req.body;
+    const owner = await Owner.findOne({ uid: uid });
     if (!owner) return res.status(401).json("Owner not found");
     owner.fullname = fullname;
-    owner.save();
-    res.status(200).json(owner);
-  } catch (err) {
-    console.error(err);
-    res.status(401).json({message:"Not found owner data"});
-  }
-})
-
-router.post("/:uid/update/address", async (req, res) => {
-  try {
-    const { uid } = req.params;
-    const { address } = req.body;
-    const owner = await Owner.findOne({uid:uid});
-    if (!owner) return res.status(401).json("Owner not found");
     owner.address = address;
+    owner.mobile = mobile;
+    owner.email = email;
     owner.save();
     res.status(200).json(owner);
   } catch (err) {
     console.error(err);
-    res.status(401).json({message:"Not found owner data"});
+    res.status(401).json({ message: "Not found owner data" });
   }
 })
 
 router.post("/:uid/update/pet", async (req, res) => {
   try {
     const { uid } = req.params;
-    const { oldPID, newPID } = req.body;
-    const owner = await Owner.findOne({uid:uid});
-    if (!owner) return res.status(401).json("Owner not found");
-    // owner.pet list find old pet id, and replace with new pet id
-    owner.save();
+    const { newPID } = req.body;
+    const owner = await Owner.findOne({ uid: uid });
+    //const previousOwner = await Owner.findOne({ pet: { $in: [newPID] } });
+    if (!owner) return res.status(401).json("Owners not found");
+
+    owner.pet.push(newPID);
+
+    await owner.save();
     res.status(200).json(owner);
   } catch (err) {
     console.error(err);
-    res.status(401).json({message:"Not found owner data"});
+    res.status(401).json({ message: "Not found owner data" });
   }
 })
 

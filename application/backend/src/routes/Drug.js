@@ -11,7 +11,7 @@ router.get("/all", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    const { value } = req.body;
+    const { value, type } = req.body;
     if (!value) {
       return res.status(400).json({ error: "Specify the name of the drug" });
     }
