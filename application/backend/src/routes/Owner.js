@@ -1,6 +1,6 @@
 import express from "express";
 import { Owner } from "../models/Owner.js";
-import { Pet } from "../models/Pet.js";
+import crypto from "crypto";
 
 const router = express.Router();
 
@@ -10,55 +10,62 @@ router.get("/all", async (req, res) => {
   res.json(owners);
 });
 
-router.get("/:uid/exist", async (req, res) => {
-  const { uid } = req.params;
-  const owner = await Owner.findOne({uid:uid});
-  if(owner) {
-    return res.status(201).json({ message: "Owner exists", uid: uid });
-  }
-});
-
 router.get("/:uid/data", async (req, res) => {
   try {
     const { uid } = req.params;
     const owner = await Owner.findOne({ uid: uid });
-    if (!owner) return res.status(401).json("Owner not found");
+    if (!owner) return res.status(401).json({ error: "Owner not found"});
     res.status(200).json(owner);
   } catch (err) {
     console.error(err);
-    res.status(401).json({ message: "Not found owner data" });
+    res.status(401).json({ error: "Not found owner data" });
   }
-})
+});
+
+router.get("/:uid/active", async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const owner = await Owner.findOne({ uid: uid });
+    if (!owner) return res.status(401).json({ error: "Owner not found"});
+    if ((new Date() - owner.lastvisit) / (1000 * 60 * 60 * 24) > 365) {
+      res.status(200).json({ message: "Owner is inactive", active: false });
+    } else {
+      res.status(200).json({ message: "Owner is active", active: true });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: "Not found owner data" });
+  }
+});
 
 router.post("/register", async (req, res) => {
   try {
-    const { fullname, email, mobile, address, birthday } = req.body;
+    const { fullname, email, mobile, address } = req.body;
     if (!fullname || !address) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     // 2️⃣ Check if username or email already exists
-    const existing = await Owner.findOne({ $and: [{ fullname }, { address }] }); // decide primary identifiers
+    const existing = await Owner.findOne({ $and: [{ fullname }, { address }] }); // primary identifiers
     if (existing) {
-      //return res.status(400).json({ error: "Patient already exists" });
-      return res.status(201).json({ message: "Owner updated successfully", uid: existing.uid });
+      return res.status(401).json({ error: "Owner already exists" });
+      //return res.status(201).json({ message: "Owner updated successfully", uid: existing.uid });
     }
 
     let uuid = crypto.randomUUID();
 
     // 4️⃣ Create new user
-    const newPatient = new Owner({
+    const newOwner = new Owner({
       uid: uuid,
       fullname,
       email: email,
       mobile: mobile,
       address: address,
       registered: new Date().toISOString(),
-      pet: [],
-      record: []
+      pet: []
     });
 
-    await newPatient.save();
+    await newOwner.save();
 
     res.status(201).json({ message: "Owner registered successfully", uid: uuid });
   } catch (err) {
@@ -67,40 +74,62 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/:uid/update", async (req, res) => {
+router.post("/:uid/update/info", async (req, res) => {
   try {
     const { uid } = req.params;
-    const { fullname, address, mobile, email } = req.body;
+    const { 
+      fullname, address, mobile, email
+     } = req.body;
     const owner = await Owner.findOne({ uid: uid });
-    if (!owner) return res.status(401).json("Owner not found");
-    owner.fullname = fullname;
-    owner.address = address;
-    owner.mobile = mobile;
-    owner.email = email;
-    owner.save();
-    res.status(200).json(owner);
+    if (!owner) return res.status(401).json({ error: "Owner not found" });
+    if (owner.fullname === fullname && owner.address === address &&
+        owner.mobile === mobile && owner.email === email) {
+      return res.status(200).json({ message: "No changes detected" });
+    }
+    if(fullname !== owner.fullname) owner.fullname = fullname;
+    if(address !== owner.address) owner.address = address;
+    if(mobile !== owner.mobile) owner.mobile = mobile;
+    if(email !== owner.email) owner.email = email;
+
+    await owner.save();
+    res.status(200).json({message: "Owner updated successfully", uid: owner.uid});
   } catch (err) {
     console.error(err);
-    res.status(401).json({ message: "Not found owner data" });
+    res.status(401).json({ error: "Not found owner data" });
   }
-})
+});
 
 router.post("/:uid/update/pet", async (req, res) => {
   try {
     const { uid } = req.params;
-    const { newPID } = req.body;
+    const { newPet } = req.body;
     const owner = await Owner.findOne({ uid: uid });
-    //const previousOwner = await Owner.findOne({ pet: { $in: [newPID] } });
-    if (!owner) return res.status(401).json("Owners not found");
-
-    owner.pet.push(newPID);
-
+    if (!owner) return res.status(401).json({ error: "Owner not found" });
+    console.debug(owner.pet, newPet);
+    owner.pet.push(newPet);
+    console.debug(owner.pet, newPet);
     await owner.save();
-    res.status(200).json(owner);
+    res.status(200).json({ message: "Pet updated successfully", uid: owner.uid, pid: owner.pet });
   } catch (err) {
     console.error(err);
-    res.status(401).json({ message: "Not found owner data" });
+    res.status(401).json({ error: "Not found owner data" });
   }
-})
+});
+
+router.post("/:uid/update/debt", async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { amount } = req.body;
+    const owner = await Owner.findOne({ uid: uid });
+    if (!owner) return res.status(401).json({ error: "Owner not found" });
+    
+    owner.debt = 0;
+    await owner.save();
+    res.status(200).json({ message: "Debt updated successfully", uid: owner.uid });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: "Not found owner data" });
+  }
+});
 
 export default router;

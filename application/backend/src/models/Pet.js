@@ -9,9 +9,12 @@ export const petSchema = new mongoose.Schema({
   breed:       { type: Array },
   colour:      { type: Array },
   sex:         { type: String },
-  neuter:      { type: Boolean },
-  alive:       { type: Boolean },
+  neuter:      { type: Boolean, default: false },
+  neuterDate:  { type: Date },
+  alive:       { type: Boolean, default: true },
   birthday:    { type: Date },
+  photo:       { type: String },
+  registered:  { type: Date, default: Date.now },
   record:      [{ type: String }]
 });
 

@@ -128,7 +128,7 @@ export default function ProfileEditorPage() {
             <input
               type="text"
               value={owner.mobile || ""}
-              onChange={(e) => setOwner({ ...owner, phone: e.target.value })}
+              onChange={(e) => setOwner({ ...owner, mobile: e.target.value })}
               placeholder="Mobil"
               className=""
             />
@@ -137,6 +137,13 @@ export default function ProfileEditorPage() {
               value={owner.address || ""}
               onChange={(e) => setOwner({ ...owner, address: e.target.value })}
               placeholder="Lakcím"
+              className=""
+            />
+            <input
+              type="text"
+              value={owner.debt || ""}
+              onChange={(e) => setOwner({ ...owner, debt: e.target.value })}
+              placeholder="Tartozás"
               className=""
             />
           </div>

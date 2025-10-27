@@ -5,100 +5,114 @@ import Link from "next/link";
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { hu } from "date-fns/locale";
+
+
 export default function AdmissionPage() {
     const router = useRouter();
-    const { name, address, email, mobile, uid } = router.query;
+    const { uid, existingowner, name } = router.query;
 
-    const [fullname, setFullName] = useState("");
+    const [ownerData, setOwnerData] = useState({});
+
+    const [ownerFullName, setOwnerFullName] = useState("");
+    const [ownerAddress, setOwnerAddress] = useState("");
     const [ownerMobile, setOwnerMobile] = useState("");
     const [ownerEmail, setOwnerEmail] = useState("");
-    const [ownerAddress, setOwnerAddress] = useState("");
-
-    const [ownerUID, setOwnerUID] = useState("");
 
     const [existingOwner, setExistingOwner] = useState(false);
     const [existingOwnerSubmit, setExistingOwnerSubmit] = useState("Új tulajdonos és állat felvétel");
 
+    const [ownerID, setOwnerID] = useState("");
+    const [petIDs, setPetIDs] = useState([]);
+
+    const [ownerPetData, setOwnerPetData] = useState({});
+
     const [petName, setPetName] = useState("");
-    const [chipid, setChipid] = useState("");
-    const [species, setSpecies] = useState("");
-    const [breed, setBreed] = useState("");
-    const [petSex, setPetSex] = useState("male");
-    const [petNeuter, setPetNeuter] = useState("non-neutralised");
+    const [petSpecies, setPetSpecies] = useState("");
+    const [petBreed, setPetBreed] = useState([]);
+    const [petColour, setPetColour] = useState([]);
+    const [petSex, setPetSex] = useState("");
+    const [petAlive, setPetAlive] = useState(true);
+    const [petNeuter, setPetNeuter] = useState(false);
     const [petNeutraliseDate, setPetNeutraliseDate] = useState("");
-    
-    const [colour, setColour] = useState("");
-    const [petNote, setPetNote] = useState("");
     const [petBirthDay, setPetBirthDay] = useState("");
+    const [petChipID, setPetChipID] = useState("");
+    const [petNote, setPetNote] = useState("");
+
+    const [petPhoto, setPetPhoto] = useState(null);
+    const [petPhotoPreview, setPetPhotoPreview] = useState(null);
 
     const [speciesSuggestions, setSpeciesSuggestions] = useState([]);
     const [dogBreedSuggestions, setDogBreedSuggestions] = useState([]);
+    const [selectedSpecies, setSelectedSpecies] = useState([]);
+    const [selectedBreeds, setSelectedBreeds] = useState([]);
+    const [selectedColours, setSelectedColours] = useState([]);
+
     const [saving1, setSaving1] = useState(false);
     const [saving2, setSaving2] = useState(false);
 
     const [petCache, setPetCache] = useState([]);
 
-    const [selectedSpecies, setSelectedSpecies] = useState([]);
-    const [selectedBreeds, setSelectedBreeds] = useState([]);
-    const [selectedColours, setSelectedColours] = useState([]);
-
     const speciesOptions = [
         { value: 'kutya', label: 'Kutya' },
-        { value: 'macska', label: 'Macska',  },
-        { value: 'nyúl', label: 'Nyúl',  },
-        { value: 'hörcsög', label: 'Hörcsög',  },
+        { value: 'macska', label: 'Macska', },
+        { value: 'nyúl', label: 'Nyúl', },
+        { value: 'hörcsög', label: 'Hörcsög', },
         { value: 'görény', label: 'Görény', },
-        { value: 'tengerimalac', label: 'Tengerimalac',  },
-        { value: 'teknős', label: 'Teknős',  },
+        { value: 'tengerimalac', label: 'Tengerimalac', },
+        { value: 'teknős', label: 'Teknős', },
         { value: 'sertés', label: 'Sertés', },
     ];
 
     const breedOptionsMap = {
         kutya: [
-        { value: 'keverék', label: 'Keverék', },
-        { value: 'labrador', label: 'Labrador' },
-        { value: 'német juhász', label: 'Német juhász',  },
-        { value: 'golden retriever', label: 'Golden retriever',  },
-        { value: 'puli', label: 'Puli',  },
-        { value: 'beagle', label: 'Beagle', },
-        { value: 'bulldog', label: 'Bulldog',  },
-        { value: 'husky', label: 'Husky',  },
-        { value: 'tacskó', label: 'Tacskó',  },
-        { value: 'rottweiler', label: 'Rottweiler'},
-        { value: 'border collie', label: 'Border Collie'},
-        { value: 'vizsla', label: 'Vizsla'},
+            { value: 'keverék', label: 'Keverék', },
+            { value: 'labrador', label: 'Labrador' },
+            { value: 'német juhász', label: 'Német juhász', },
+            { value: 'golden retriever', label: 'Golden retriever', },
+            { value: 'puli', label: 'Puli', },
+            { value: 'beagle', label: 'Beagle', },
+            { value: 'bulldog', label: 'Bulldog', },
+            { value: 'husky', label: 'Husky', },
+            { value: 'tacskó', label: 'Tacskó', },
+            { value: 'rottweiler', label: 'Rottweiler' },
+            { value: 'border collie', label: 'Border Collie' },
+            { value: 'vizsla', label: 'Vizsla' },
         ],
         macska: [
-        { value: 'sziámi', label: 'Sziámi' },
-        { value: 'maine coon', label: 'Maine coon',  },
-        { value: 'ragdoll', label: 'Ragdoll',  },
-        { value: 'orosz kék', label: 'Orosz kék',  },
-        { value: 'keverék', label: 'Keverék',  },
+            { value: 'keverék', label: 'Keverék', },
+            { value: 'sziámi', label: 'Sziámi' },
+            { value: 'maine coon', label: 'Maine coon', },
+            { value: 'ragdoll', label: 'Ragdoll', },
+            { value: 'orosz kék', label: 'Orosz kék', },
         ],
         nyúl: [
-        { value: 'holland lop', label: 'Holland lop' },
-        { value: 'rex', label: 'Rex',  },
-        { value: 'lengyel', label: 'Lengyel',  },
-        { value: 'európai', label: 'Európai',  },
-        { value: 'keverék', label: 'Keverék',  },
+            { value: 'keverék', label: 'Keverék', },
+            { value: 'holland lop', label: 'Holland lop' },
+            { value: 'rex', label: 'Rex', },
+            { value: 'lengyel', label: 'Lengyel', },
+            { value: 'európai', label: 'Európai', },
+
         ],
         tengerimalac: [
-        { value: 'keverék', label: 'Keverék',  },
+            { value: 'keverék', label: 'Keverék', },
         ],
         teknős: [
-        { value: 'keverék', label: 'Keverék',  },
+            { value: 'keverék', label: 'Keverék', },
         ],
         sertés: [
-        { value: 'keverék', label: 'Keverék',  },
+            { value: 'keverék', label: 'Keverék', },
         ],
     };
     const colourOptions = [
         { value: 'barna', label: 'Barna' },
-        { value: 'sárga', label: 'Sárga',  },
-        { value: 'fehér', label: 'Fehér',  },
-        { value: 'fekete', label: 'Fekete',  },
+        { value: 'sárga', label: 'Sárga', },
+        { value: 'fehér', label: 'Fehér', },
+        { value: 'fekete', label: 'Fekete', },
         { value: 'trikolor', label: 'Trikolor', },
-        { value: 'bézs', label: 'Bézs',  },
+        { value: 'bézs', label: 'Bézs', },
         { value: 'pöttyös', label: 'Pöttyös', },
         { value: 'szürke', label: 'Szürke', },
         { value: 'fóka', label: 'Fóka', },
@@ -108,30 +122,59 @@ export default function AdmissionPage() {
     const breedOptions = breedOptionsMap[selectedSpecies?.value] || [];
 
     useEffect(() => {
-        if (name) {
-            setFullName(name);
-        }
-        if (address) {
-            setOwnerAddress(address);
-        }
-        if (email) {
-            setOwnerEmail(email);
-        }
-        if (mobile) {
-            setOwnerMobile(mobile);
-        }
+        console.debug("URL args:", uid, existingowner);
         if (uid) {
-            console.debug("1. Owner exists: ",uid,ownerUID);
+            setOwnerID(uid);
             setExistingOwner(true);
-            setOwnerUID(uid);
-            console.debug("2. Owner exists: ",uid,ownerUID);
             setExistingOwnerSubmit("Meglévő tulajdonoshoz új állat(ok) felvétele");
+        } else {
+            setExistingOwner(false);
+            setOwnerFullName(name || "");
+            setExistingOwnerSubmit("Új tulajdonoshoz új állat(ok) felvétele");
         }
-    }, [address, name, mobile, email, uid]);
 
-    
+        const fetchOwnerAndPetsData = async () => {
+            try {
+                const ownerRes = await axios.get(`${process.env.API_URL}/owner/${uid}/data`, { withCredentials: true });
+                setOwnerData(ownerRes.data);
+                setOwnerFullName(ownerRes.data.fullname);
+                setOwnerAddress(ownerRes.data.address);
+                setOwnerMobile(ownerRes.data.mobile);
+                setOwnerEmail(ownerRes.data.email);
+                setOwnerID(uid);
+
+                const pets = ownerRes.data.pet || [];
+                const petsRes = await Promise.all(
+                    pets.map(async (pid) => {
+                        const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true });
+                        return petRes.data;
+                    })
+                );
+                setOwnerPetData(petsRes);
+            } catch (err) {
+                console.error("Error fetching pets and owners data:", err);
+            }
+        };
+
+        if (uid) {
+            fetchOwnerAndPetsData();
+        } else {
+            setExistingOwner(false);
+        }
+    }, [uid, existingowner, name]);
+
+
+
     const handleRemovePet = (index) => {
         setPetCache(petCache.filter((_, i) => i !== index));
+    };
+
+        const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setPetPhoto(file);
+            setPetPhotoPreview(URL.createObjectURL(file));
+        }
     };
 
     const handleChangeChipID = (e) => {
@@ -140,27 +183,37 @@ export default function AdmissionPage() {
 
         // insert hyphens every 4 digits
         let formatted = value.match(/.{1,4}/g)?.join("-") || "";
-        setChipid(formatted);
+        setPetChipID(formatted);
     };
+
+    const formatDateForDisplay = (isoDate) => {
+  if (!isoDate) return "";
+  const date = new Date(isoDate);
+  return new Intl.DateTimeFormat("hu-HU").format(date); // e.g. 2025. 10. 27.
+};
 
     const handleAddPet = (e) => {
         e.preventDefault();
         if (!petName) return;
         setPetCache([...petCache, {
             name: petName,
-            chipid,
+            chipid: petChipID,
             species: selectedSpecies.value,
             breed: selectedBreeds.map(b => b.value),
             sex: petSex,
             colour: selectedColours.map(c => c.value),
             birthday: petBirthDay,
-            neuter: (petNeuter == "ivartalanított")
+            neuter: petNeuter,
+            alive: true,
+            photo: petPhoto,
+            photoPreview: petPhotoPreview,
+            note: petNote,
         }]);
         setPetName("");
-        setSpecies("");
+        setPetSpecies("");
         setSelectedSpecies("");
-        setChipid("");
-        setBreed("");
+        setPetChipID("");
+        setPetBreed([]);
         setPetSex("");
         setPetBirthDay("");
         setSpeciesSuggestions([]);
@@ -168,25 +221,27 @@ export default function AdmissionPage() {
 
     const handleOwnerSubmit = async (e) => {
         e.preventDefault();
-        if (!fullname) return;
+        if (!ownerFullName) return;
         setSaving1(true);
         setSaving2(true);
-        try {
-            if(!existingOwner) { // new owner
-                const ownerRes = await axios.post(`${process.env.API_URL}/owner/register`, {
-                    fullname,
-                    mobile: ownerMobile,
-                    email: ownerEmail,
-                    address: ownerAddress,
-                }, { withCredentials: true });
-                setOwnerUID(ownerRes.data.uid);
-                console.debug("new Owner uid:", ownerUID);
-            }
 
-            // Submit all cached pets
+        try {
+            console.debug("Register all cached pets");
+            const newPetIDs = [];
+
+            // Submit all cached pets first
             for (const pet of petCache) {
+                let photoUrl = null;
+                if (pet.photo) {
+                    const formData = new FormData();
+                    formData.append("file", pet.photo);
+                    const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`, { photo: formData }, {
+                        headers: { "Content-Type": "multipart/form-data" },
+                        withCredentials: true,
+                    });
+                    photoUrl = uploadRes.data.url;
+                }
                 const petRes = await axios.post(`${process.env.API_URL}/pet/register`, {
-                    uid: ownerUID,
                     chipid: pet.chipid,
                     name: pet.name,
                     species: pet.species,
@@ -194,48 +249,84 @@ export default function AdmissionPage() {
                     sex: pet.sex,
                     colour: pet.colour,
                     birthday: pet.birthday,
-                    neuter: pet.neuter
+                    neuter: pet.neuter,
+                    alive: true,
+                    photo: photoUrl || ""
                 }, { withCredentials: true });
-                const newPID = petRes.data.pid;
-                console.debug("new pet id:",newPID);
-                if(existingOwner) {
-                    const ownerRes = await axios.post(`${process.env.API_URL}/owner/${uid}/update/pet`, {
-                        newPID:newPID
-                    }, { withCredentials: true });
-                    console.debug(ownerRes.data.owner.uid);
-                }
+
+                newPetIDs.push(petRes.data.pid);
+
+                
             }
 
-            // Reset all fields and cache
-            setFullName("");
+            setPetIDs(newPetIDs);
+            console.debug("Registered pets:", newPetIDs);
+
+            // If new owner:
+            if (!existingOwner) {
+                console.debug("Registering new owner");
+                const ownerRes = await axios.post(`${process.env.API_URL}/owner/register`, {
+                    fullname: ownerFullName,
+                    mobile: ownerMobile,
+                    email: ownerEmail,
+                    address: ownerAddress,
+                }, { withCredentials: true });
+
+                const newUID = ownerRes.data.uid;
+                setOwnerID(newUID);
+
+                // Attach each pet
+                for (const pid of newPetIDs) {
+                    await axios.post(`${process.env.API_URL}/owner/${newUID}/update/pet`, {
+                        newPet: pid
+                    }, { withCredentials: true });
+                }
+
+                alert("Új tulajdonos és új állat sikeresen hozzáadva");
+
+            } else {
+                // Existing owner, add pets
+                const currentUID = ownerID || ownerData.uid;
+                for (const pid of newPetIDs) {
+                    await axios.post(`${process.env.API_URL}/owner/${currentUID}/update/pet`, {
+                        newPet: pid
+                    }, { withCredentials: true });
+                }
+
+                alert("Új állat sikeresen hozzáadva meglévő tulajdonoshoz");
+            }
+
+            // Reset everything
+            setOwnerFullName("");
             setOwnerMobile("");
             setOwnerEmail("");
             setOwnerAddress("");
             setPetCache([]);
-            setExistingOwnerSubmit("Új tulajdonos és állat felvétel");
+            setPetIDs([]);
             setExistingOwner(false);
-
-            alert("Owner and pets successfully added!");
+            setExistingOwnerSubmit("Új tulajdonos és állat felvétel");
             router.push("/");
+
         } catch (err) {
             console.error("Error adding owner and pets", err);
-            //alert("Failed to add owner and pets",err);
+            alert("Hiba történt a mentés közben!");
         } finally {
-            alert("Sikeresen művelet.");
             setSaving1(false);
             setSaving2(false);
         }
     };
 
+
     return (
         <div>
-            <main style={{"margin":"0% 20%"}}>
+            <main style={{ "margin": "0% 20%" }}>
                 <div>
                     <header className="header">
                         <Link href={`/`}><h2>Főoldal</h2></Link>
-                    
-                        <h1 className="title">Új tulajdonos felvétele</h1>
-                        <div style={{"text-align":"center","margin-bottom":"5%"}}>
+
+                        <h1 className="title">Tulajdonos és állata felvétele</h1>
+
+                        <div style={{ "text-align": "center", "margin-bottom": "5%" }}>
                             <p>1. állat(ok) hozzáadása</p>
                             <p>2. tulajdonos hozzáadása</p>
                         </div>
@@ -245,11 +336,11 @@ export default function AdmissionPage() {
                     <div className="owner-form">
                         <form onSubmit={handleOwnerSubmit}>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Teljes név</label>
-                                <input type="text" value={fullname} onChange={e => setFullName(e.target.value)} required />
+                                <label><span style={{ "color": "crimson" }}>*</span> Teljes név</label>
+                                <input type="text" value={ownerFullName} onChange={e => setOwnerFullName(e.target.value)} required />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Lakcím</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Lakcím</label>
                                 <p>(ir.szám, város, utca, házszám)</p>
                                 <input type="text" value={ownerAddress} onChange={e => setOwnerAddress(e.target.value)} />
                             </div>
@@ -269,15 +360,21 @@ export default function AdmissionPage() {
                     <div className="pet-form">
                         <form onSubmit={handleAddPet}>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Állat neve</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Állat neve</label>
                                 <input type="text" value={petName} onChange={e => setPetName(e.target.value)} required />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Születési Dátum</label>
-                                <input type="date" value={petBirthDay} onChange={e => setPetBirthDay(e.target.value)} />
+                                <label><span style={{ "color": "crimson" }}>*</span> Születési Dátum</label>
+                                <DatePicker
+                                    selected={petBirthDay ? new Date(petBirthDay) : null}
+                                    onChange={(date) => setPetBirthDay(date.toISOString())} // .split("T")[0]
+                                    dateFormat="yyyy / MM / dd"
+                                    placeholderText="ÉÉÉÉ / HH / NN"
+                                    locale={hu}
+                                />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Faj</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Faj</label>
                                 <Select
                                     value={selectedSpecies}
                                     onChange={(option) => {
@@ -293,7 +390,7 @@ export default function AdmissionPage() {
                                 />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Fajta</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Fajta</label>
                                 <Select
                                     defaultValue={[]}
                                     isMulti
@@ -304,11 +401,11 @@ export default function AdmissionPage() {
                                     className="basic-multi-select"
                                     classNamePrefix="select"
                                     placeholder="..."
-                                    isDisabled={!selectedSpecies} 
+                                    isDisabled={!selectedSpecies}
                                 />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Színe</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Színe</label>
                                 <CreatableSelect
                                     defaultValue={[]}
                                     isMulti
@@ -319,11 +416,11 @@ export default function AdmissionPage() {
                                     className="basic-multi-select"
                                     classNamePrefix="select"
                                     placeholder="..."
-                                    isDisabled={!selectedSpecies} 
+                                    isDisabled={!selectedSpecies}
                                 />
                             </div>
                             <div>
-                                <label><span style={{"color":"crimson"}}>*</span> Neme</label>
+                                <label><span style={{ "color": "crimson" }}>*</span> Neme</label>
                                 <div className="radio-group">
                                     <label>
                                         <input
@@ -349,37 +446,52 @@ export default function AdmissionPage() {
                                     <label>
                                         <input
                                             type="radio"
-                                            checked={petNeuter === 'ivaros'}
-                                            onChange={() => setPetNeuter('ivaros')}
+                                            checked={!petNeuter}
+                                            onChange={() => setPetNeuter(false)}
                                         />
                                         <span>Ivaros</span>
                                     </label>
                                     <label>
                                         <input
                                             type="radio"
-                                            checked={petNeuter === 'ivartalanított'}
-                                            onChange={() => setPetNeuter('ivartalanított')}
+                                            checked={petNeuter}
+                                            onChange={() => setPetNeuter(true)}
                                         />
-                                        <span>Ivartalan</span>
+                                        <span>Ivartalanított</span>
                                     </label>
                                 </div>
                             </div>
                             <div>
                                 <label>Ivartalanítás Dátuma</label>
-                                <input type="date" value={petNeutraliseDate} onChange={e => setPetNeutraliseDate(e.target.value)} />
+                                <DatePicker
+                                    selected={petNeutraliseDate ? new Date(petNeutraliseDate) : null}
+                                    onChange={(date) => setPetNeutraliseDate(date.toISOString())}
+                                    dateFormat="yyyy / MM / dd"
+                                    placeholderText="ÉÉÉÉ / HH / NN"
+                                    locale={hu}
+                                />
+                            </div>
+                            <div>
+                                <label>Fénykép</label>
+                                <input type="file" accept="image/*" onChange={handlePhotoChange} />
+                                {petPhotoPreview && (
+                                    <div style={{ marginTop: "10px" }}>
+                                        <img src={petPhotoPreview} alt="Pet preview" style={{ width: "250px", borderRadius: "10px" }} />
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <label>Chip-szám</label>
                                 <input
-                                type="text"
-                                value={chipid}
-                                onChange={handleChangeChipID}
-                                placeholder="Enter chip ID"
+                                    type="text"
+                                    value={petChipID}
+                                    onChange={handleChangeChipID}
+                                    placeholder="chip szám"
                                 />
                             </div>
                             <div>
                                 <label>Megjegyzés</label> <br />
-                                <textarea style={{"padding":"1%"}} value={petNote} onChange={e => setPetNote(e.target.value)} />
+                                <textarea style={{ "padding": "1%" }} value={petNote} onChange={e => setPetNote(e.target.value)} />
                             </div>
                             <button type="submit" disabled={saving2}>{saving2 ? "Mentés..." : "Állat felvétel"}</button>
                         </form>
@@ -390,7 +502,10 @@ export default function AdmissionPage() {
                                 <ul>
                                     {petCache.map((pet, index) => (
                                         <li key={index}>
-                                            {pet.name} ({pet.breed} {pet.species})
+                                            {pet.name}, ({pet.breed.join("-")} {pet.species})
+                                            {pet.photoPreview && (
+                                                <img src={pet.photoPreview} alt="preview" style={{ width: "50px", marginLeft: "10px" }} />
+                                            )}
                                             <button onClick={() => handleRemovePet(index)}>Visszavon</button>
                                         </li>
                                     ))}

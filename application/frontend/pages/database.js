@@ -8,14 +8,22 @@ export default function Database() {
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
+    const [ownerSearchTerm, setOwnerSearchTerm] = useState("");
+    const [petSearchTerm, setPetSearchTerm] = useState("");
+
     const [listOfPatients, setListOfPatients] = useState([]);
     const [listOfPets, setListOfPets] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [petSearchTerm, setPetSearchTerm] = useState("");
+    const [listOfPetsIDandName, setListOfPetsIDandName] = useState([]);
+    
     const [selectedPetOwner, setSelectedPetOwner] = useState(null);
     const [selectedPet, setSelectedPet] = useState(null);
     const [petData, setPetData] = useState(null); // store fetched data
     const [petDataLoading, setPetDataLoading] = useState(false); // store fetched data
+
+    const [showDebtModal, setShowDebtModal] = useState(false);
+    const [processingDebt, setProcessingDebt] = useState(false);   
+    const [debtOwnerID, setDebtOwnerID] = useState(null); 
+    const [debtOwnerName, setDebtOwnerName] = useState(null);
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -28,6 +36,7 @@ export default function Database() {
                 //console.debug(patientRes.data,petRes.data);
                 setListOfPatients(patientRes.data);
                 setListOfPets(petRes.data);
+                setListOfPetsIDandName(petRes.data.map(p => ({pid: p.pid, name: p.name})));
             } catch (err) {
                 console.error("Error fetching pets and owners data:", err);
             } finally {
@@ -38,11 +47,20 @@ export default function Database() {
     }, []);
 
     const filteredPatients = listOfPatients.filter((p) => {
-        const term = searchTerm.toLowerCase().trim();
-        if (!term) return true;
+        const ownerTerm = ownerSearchTerm.toLowerCase().trim();
+        //if (!ownerTerm) return true;
+        const petTerm = petSearchTerm.toLowerCase().trim();
+        //if (!petTerm) return true;
 
-        const fullNameMatch = p.fullname.toLowerCase().includes(term);        
-        return fullNameMatch;
+        const fullNameMatch = p.fullname.toLowerCase().includes(ownerTerm);
+        const petsNameMatch = listOfPetsIDandName
+            .filter(pet => p.pet.includes(pet.pid))
+            .some(pet => pet.name.toLowerCase().includes(petTerm));
+
+        if (!ownerTerm && petTerm) return petsNameMatch;
+        if (ownerTerm && !petTerm) return fullNameMatch;
+
+        return fullNameMatch || petsNameMatch;
     });
 
     const translate = (type) => {
@@ -73,23 +91,6 @@ export default function Database() {
         return `${age} éves`;
     }
 
-    const getDaysRemaining = (startDateString, duration) => {
-        const startDate = new Date(startDateString);
-        const today = new Date();
-
-        // Calculate the end date
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + duration);
-
-        // Calculate difference in milliseconds
-        const diffMs = endDate - today;
-
-        // Convert milliseconds to days
-        const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-        return remainingDays >= 0 ? remainingDays : 0; // return 0 if already passed
-    }
-
     const fetchPetData = async (pid) => {
         try {
             setPetDataLoading(true);
@@ -112,11 +113,31 @@ export default function Database() {
         return listOfPets.filter(pet => petIds.includes(pet.pid));
     };
 
+const handleConfirmPayDebt = async () => {
+  setProcessingDebt(true);
+  try {
+    const targetUID = debtOwnerID;
+    const res = await axios.post(
+      `${process.env.API_URL}/owner/${targetUID}/update/debt`,
+      { amount: 0 },
+      { withCredentials: true }
+    );
+    console.log("Debt payment response:", res.data);
+    alert("Tartozás sikeresen rendezve.");
+  } catch (err) {
+    console.error("Error paying debt:", err);
+    alert("Failed to process debt payment.");
+  } finally {
+    setProcessingDebt(false);
+    setShowDebtModal(false);
+  }
+};
+
     if (loading) return <></>;
     if (!listOfPatients) return (
         <>
-            <p>Patients not found or you do not have access.</p>
-            <Link href="/"><p>Go back to homepage</p></Link>
+            <p>A tulajdonosok nem találhatók, vagy nincs hozzáférésed.</p>
+            <Link href="/"><p>Vissza a főoldalra</p></Link>
         </>
     );
 
@@ -136,8 +157,21 @@ export default function Database() {
                             type="text"
                             className="input"
                             placeholder="Teljes neve"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            value={ownerSearchTerm}
+                            onChange={(e) => setOwnerSearchTerm(e.target.value)}
+                        />
+                    </label>
+                </section>
+
+                <section className="search-section">
+                    <label>
+                        Állat neve:
+                        <input
+                            type="text"
+                            className="input"
+                            placeholder="Állat neve"
+                            value={petSearchTerm}
+                            onChange={(e) => setPetSearchTerm(e.target.value)}
                         />
                     </label>
                 </section>
@@ -164,10 +198,17 @@ export default function Database() {
                                     {p.debt > 0 && (
                                         <p>
                                             <strong style={{"color":"crimson"}}>Tartozás:</strong> {p.debt} Ft 
-                                            <button className="button" 
-                                            onClick={() => {router.push(`/pay-debt?uid=${encodeURIComponent(`${p.uid}`)}`)}}>
-                                                Kifizetés
-                                            </button>
+                                            <button
+      type="button"
+      className="button"
+      onClick={() => {
+        setShowDebtModal(true);
+        setDebtOwnerID(p.uid);
+        setDebtOwnerName(p.fullname);
+    }}
+    >
+        Rendezés
+    </button>
                                         </p>
 
                                     )}
@@ -194,11 +235,11 @@ export default function Database() {
                                                     {getPetsForOwner(p.uid).map((pet) => (
                                                         <li key={pet.pid} className="pet-card">
                                                             <div>
-                                                                <span>[{pet.alive ? "Élő" : "Elhunyt"}] </span>
-                                                                <span className="pet-name">{pet.name}</span> - {getAgeString(pet.birthday)}
+                                                                <span><b>{pet.alive ? "" : "† "}</b></span>
+                                                                <span className="pet-name">{pet.name}</span> - {pet.alive ? getAgeString(pet.birthday) : ""}
                                                             </div>
                                                             <div>
-                                                                {pet.species} - {pet.breed.join(" ")} - {pet.sex}
+                                                                {pet.sex}, {pet.breed.join("-")} {pet.species}
                                                             </div>
                                                             <button
                                                                 className="button secondary"
@@ -222,7 +263,7 @@ export default function Database() {
                                                 <button
                                                     onClick={() =>
                                                         router.push(
-                                                           `/admission?uid=${encodeURIComponent(`${p.uid}`)}&name=${encodeURIComponent(`${p.fullname}`)}&address=${encodeURIComponent(`${p.address}`)}&email=${encodeURIComponent(`${p.email}`)}&mobile=${encodeURIComponent(`${p.mobile}`)}`
+                                                           `/admission?existingowner=true&uid=${encodeURIComponent(`${p.uid}`)}`
                                                         )
                                                     }
                                                 >
@@ -236,7 +277,7 @@ export default function Database() {
                                                     className="button primary"
                                                     onClick={() =>
                                                         router.push(
-                                                            `/admission?uid=${encodeURIComponent(`${p.uid}`)}&name=${encodeURIComponent(`${p.fullname}`)}&address=${encodeURIComponent(`${p.address}`)}&email=${encodeURIComponent(`${p.email}`)}&mobile=${encodeURIComponent(`${p.mobile}`)}`
+                                                            `/admission?existingowner=true&uid=${encodeURIComponent(`${p.uid}`)}`
                                                         )
                                                     }
                                                 >
@@ -308,12 +349,12 @@ export default function Database() {
                     <div className="no-results">
                         <p>Nincs ilyen nevű tulajdonos a rendszerben.</p>
                         <p>
-                            Hozzá szeretnéd adni a nyilvántartáshoz <strong>{searchTerm}</strong>-t?
+                            Hozzá szeretnéd adni a nyilvántartáshoz <strong>{ownerSearchTerm}</strong>-t?
                         </p>
                         <br/>
                         <button
                             onClick={() =>
-                                router.push(`/admission?name=${encodeURIComponent(searchTerm)}`)
+                                router.push(`/admission?existingowner=false&name=${encodeURIComponent(ownerSearchTerm)}`)
                             }
                         >
                             TULAJDONOS FELVÉTEL
@@ -324,6 +365,56 @@ export default function Database() {
                 <footer className="footer">
                     <p>&copy; 2025 FKPMA. All rights reserved.</p>
                 </footer>
+                {showDebtModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      backgroundColor: "rgba(0,0,0,0.5)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1000,
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        padding: "2rem",
+        borderRadius: "12px",
+        maxWidth: "400px",
+        textAlign: "center",
+      }}
+    >
+      <h3>Kifizetés megerősítése</h3>
+      <p>Biztosan kifizetettként szeretnéd megjelölni {debtOwnerName} adósságát?</p>
+      <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "space-around" }}>
+        <button
+          onClick={() => setShowDebtModal(false)}
+          style={{ padding: "0.5rem 1rem" }}
+        >
+          Nem
+        </button>
+        <button
+          onClick={handleConfirmPayDebt}
+          disabled={processingDebt}
+          style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: processingDebt ? "gray" : "#27ae60",
+            color: "white",
+            borderRadius: "6px",
+          }}
+        >
+          {processingDebt ? "Feldolgozás..." : "Megerősítés"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
             </main>
         </div>
     );

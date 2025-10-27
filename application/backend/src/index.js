@@ -7,8 +7,11 @@ import ownerRoutes from "./routes/Owner.js";
 import petRoutes from "./routes/Pet.js";
 import recordRoutes from "./routes/Record.js";
 import drugRoutes from "./routes/Drug.js";
+import photoRoutes from "./routes/Photo.js";
 
 import { connectDB } from "./config/db.js";
+
+import path from "path";
 
 dotenv.config();    
 
@@ -38,6 +41,9 @@ app.use("/owner", ownerRoutes);
 app.use("/pet", petRoutes);
 app.use("/drug", drugRoutes);
 app.use("/record", recordRoutes);
+app.use("/photo", photoRoutes);
+
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.get("/", (req, res) => res.json({ status: "ok", service: "backend"}));
 

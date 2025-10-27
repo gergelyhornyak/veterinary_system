@@ -564,7 +564,7 @@ db.records.insertMany(
   [
     {
       rid: "7a1b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
-      date: "2023-07-15T14:22:33",
+      date: "2023-07-15T14:22:33Z",
       type: "vaccination",
       vaccination: [
         { value: "NOBIVAC TRICAT", label: "NOBIVAC TRICAT" }
@@ -573,7 +573,7 @@ db.records.insertMany(
     },
     {
       rid: "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
-      date: "2023-08-22T10:15:00",
+      date: "2023-08-22T10:15:00Z",
       type: "drug",
       drug: [
         { value: "CLAVUDALE TABL. 250 MG", label: "CLAVUDALE TABL. 250 MG", note: "2x1 naponta, étkezés után" }
@@ -582,7 +582,7 @@ db.records.insertMany(
     },
     {
       rid: "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r",
-      date: "2023-09-05T16:45:12",
+      date: "2023-09-05T16:45:12Z",
       type: "treatment",
       treatment: [
         { notes: "Fogkőeltávolítás elvégezve" }
@@ -591,7 +591,7 @@ db.records.insertMany(
     },
     {
       rid: "4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s",
-      date: "2023-10-18T11:30:45",
+      date: "2023-10-18T11:30:45Z",
       type: "receipt",
       receipt: [
         { value: "APTUS NUTRISAL", label: "APTUS NUTRISAL" }
@@ -600,7 +600,7 @@ db.records.insertMany(
     },
     {
       rid: "5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t",
-      date: "2023-11-30T09:20:15",
+      date: "2023-11-30T09:20:15Z",
       type: "drug",
       drug: [
         { value: "KEFAVET TABL. 500 MG", label: "KEFAVET TABL. 500 MG", note: "1x1 reggel" }

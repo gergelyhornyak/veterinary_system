@@ -15,11 +15,10 @@
     "express-session": "1.18.2",
     "mongoose": "8.18.0",
     "openid-client": "6.6.4",
-    "jsonwebtoken": "9.0.2",
-    "bcrypt": "6.0.0",
     "cookie-parser": "1.4.7",
     "node-cron": "4.2.1",
     "seedrandom": "3.0.5",
-    "json-2-csv": "5.0.1"
+    "json-2-csv": "5.0.1",
+    "multer": "2.0.2"
   }
 }

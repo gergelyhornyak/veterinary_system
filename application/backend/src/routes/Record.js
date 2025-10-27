@@ -4,6 +4,7 @@ import { Pet } from "../models/Pet.js";
 import { Owner } from "../models/Owner.js";
 import { Drug } from "../models/Drug.js";
 import { json2csv } from 'json-2-csv';
+import crypto from "crypto";
 
 const router = express.Router();
 
@@ -17,55 +18,44 @@ router.get("/:rid/data", async (req, res) => {
   try {
     const { rid } = req.params;
     const record = await Record.findOne({ rid: rid });
-    if (!record) return res.status(401).json("Record not found");
+    if (!record) return res.status(401).json({ error: "Record not found" });
     res.status(200).json(record);
   } catch (err) {
     console.error(err);
-    res.status(401).json({ message: "Not found record" });
+    res.status(401).json({ error: "Record not found" });
   }
 })
 
 router.post("/add", async (req, res) => {
   try {
-    const { pid, vaccination, treatment, weight, note } = req.body;
-    if (!pid) {
+    const { date, type, drug, vaccination, treatment, receipt, note } = req.body;
+    if (!date || !type ) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     let uuid = crypto.randomUUID();
 
-    // 4️⃣ Create new user
-    const recordContent = {
+    const newRecord = new Record({
       rid: uuid,
-      date: new Date().toISOString(),
+      date: date,
+      type: type,
+      drug: drug,
+      receipt: receipt,
       vaccination: vaccination,
       treatment: treatment,
-      weight: weight,
       note: note
-    }
-    const newRecord = new Record(recordContent);
+    });
 
     await newRecord.save();
+    res.status(201).json({ message: "Record added successfully", rid: uuid });
 
-    try {
-      const pet = await Pet.findOne({ pid });
-      if (!pet) {
-        throw new Error("Pet not found");
-      }
-      pet.record.push(recordContent);
-      await pet.save();
-    } catch (err) {
-      console.log(err);
-    }
-
-    res.status(201).json({ message: "Pet record registered successfully", rid: uuid });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-router.get("/export", async (req, res) => {
+router.post("/export", async (req, res) => {
   try {
     // Assuming Mongoose is already connected via connectDB.js
     const recordData = await Record.find().lean();

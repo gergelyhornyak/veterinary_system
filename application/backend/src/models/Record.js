@@ -8,7 +8,6 @@ export const recordSchema = new mongoose.Schema({
   treatment:    { type: Array, of:mongoose.Schema.Types.Mixed },
   vaccination:  { type: Array, of:mongoose.Schema.Types.Mixed },
   receipt:      { type: Array, of:mongoose.Schema.Types.Mixed },
-  weight:       { type: mongoose.Schema.Types.Mixed },
   note:         { type: String }
 });
 

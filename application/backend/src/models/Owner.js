@@ -6,9 +6,9 @@ const ownerSchema = new mongoose.Schema({
   address:    { type: String, required: true },
   email:      { type: String },
   mobile:     { type: String },
+  registered:  { type: Date, default: Date.now },
   pet:        [{ type: String }],
   lastvisit:  { type: Date },
-  record:     [{ type: String }],
   debt:       { type: Number, default: 0 },
 });
 
