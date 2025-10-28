@@ -148,7 +148,7 @@ db.owners.insertMany(
       fullname: "Takács Norbert",
       mobile: "+36308881122",
       email: "takacs.norbert@gmail.com",
-      debt: 0,
+      debt: 4500,
       address: "4400, Nyíregyháza, Szent István utca, 28",
       pet: ["764ce523-f3c5-4d10-9b60-2fd0148f2f0e"]
     },
@@ -193,7 +193,7 @@ db.owners.insertMany(
       fullname: "Kovács Anna Mária",
       mobile: "+36301112233",
       email: "kovacs.anna.maria@gmail.com",
-      debt: 0,
+      debt: 980,
       address: "2600, Vác, Duna utca, 5",
       pet: []
     },
@@ -220,7 +220,7 @@ db.owners.insertMany(
       fullname: "Tóth Gábor",
       mobile: "+36304445599",
       email: "toth.gabor@hotmail.com",
-      debt: 0,
+      debt: 10000,
       address: "2120, Dunakeszi, Liget utca, 4",
       pet: []
     },
@@ -238,7 +238,7 @@ db.owners.insertMany(
       fullname: "Kiss Nagy Katalin",
       mobile: "+36301119955",
       email: "kiss.katalin@yahoo.com",
-      debt: 0,
+      debt: 2000,
       address: "2132, Göd, Ady Endre utca, 6",
       pet: []
     },
@@ -566,90 +566,87 @@ db.records.insertMany(
       rid: "7a1b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
       date: "2023-07-15T14:22:33Z",
       type: "vaccination",
-      vaccination: [
-        { value: "NOBIVAC TRICAT", label: "NOBIVAC TRICAT" }
-      ],
+      vaccination: 
+      { value: "NOBIVAC TRICAT", label: "NOBIVAC TRICAT" },
       note: "Védőoltás beadva, enyhe láz jelentkezett, pihenés javasolt"
     },
     {
       rid: "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
       date: "2023-08-22T10:15:00Z",
       type: "drug",
-      drug: [
-        { value: "CLAVUDALE TABL. 250 MG", label: "CLAVUDALE TABL. 250 MG", note: "2x1 naponta, étkezés után" }
-      ],
+      drug: 
+      { value: "CLAVUDALE TABL. 250 MG", label: "CLAVUDALE TABL. 250 MG", note: "2x1 naponta, étkezés után" },
       note: "Bőrgyulladás kezelése, antibiotikum kúra megkezdve"
     },
     {
       rid: "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r",
       date: "2023-09-05T16:45:12Z",
       type: "treatment",
-      treatment: [
-        { notes: "Fogkőeltávolítás elvégezve" }
-      ],
+      treatment:
+        { notes: "Fogkőeltávolítás elvégezve" },
       note: "Szájhigiénia rendben, kontroll 6 hónap múlva esedékes"
     },
     {
       rid: "4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s",
       date: "2023-10-18T11:30:45Z",
       type: "receipt",
-      receipt: [
+      receipt: 
         { value: "APTUS NUTRISAL", label: "APTUS NUTRISAL" }
-      ],
+      ,
       note: "Folyadékpótlás és vitaminok felírva, hasmenés miatt"
     },
     {
       rid: "5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t",
       date: "2023-11-30T09:20:15Z",
       type: "drug",
-      drug: [
+      drug: 
         { value: "KEFAVET TABL. 500 MG", label: "KEFAVET TABL. 500 MG", note: "1x1 reggel" }
-      ],
+      ,
       note: "Húgyúti fertőzés kezelése, sok folyadék fogyasztása javasolt"
     },
     {
       rid: "6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t1u",
-      date: "2023-12-12T13:40:22",
+      date: "2023-12-12T13:40:22Z",
       type: "vaccination",
-      vaccination: [
+      vaccination: 
         { value: "VERSICAN DHPPI/L4", label: "VERSICAN DHPPI/L4" }
-      ],
+      ,
       note: "Éves oltás beadva, kutya jól viselte"
     },
     {
       rid: "7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u2v",
-      date: "2024-01-25T15:55:33",
+      date: "2024-01-25T15:55:33Z",
       type: "treatment",
-      treatment: [
+      treatment: 
         { notes: "Fültisztítás és mintavétel" }
-      ],
+      ,
       note: "Középfülgyulladás gyanúja, további vizsgálatok szükségesek"
     },
     {
       rid: "8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v3w",
-      date: "2024-02-08T10:10:10",
+      date: "2024-02-08T10:10:10Z",
       type: "receipt",
-      receipt: [
+      receipt: 
         { value: "OTODINE 100 ML", label: "OTODINE 100 ML" }
-      ],
+      ,
       note: "Fülcseppek felírva, napi kétszeri alkalmazás javasolt"
     },
     {
       rid: "9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2v3w4x",
-      date: "2024-03-17T14:15:00",
+      date: "2024-03-17T14:15:00Z",
       type: "drug",
-      drug: [
+      drug: 
         { value: "RHEUMOCAM TABL. 2,5 MG", label: "RHEUMOCAM TABL. 2,5 MG", note: "1x1 délben" }
-      ],
+      ,
       note: "Ízületi gyulladás kezelése, mozgás mérséklése javasolt"
     },
     {
       rid: "0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x5y",
-      date: "2024-04-01T11:25:45",
+      date: "2024-04-01T11:25:45Z",
       type: "vaccination",
-      vaccination: [
+      vaccination: 
         { value: "NOBIVAC RABIES", label: "NOBIVAC RABIES" }
-      ],
+      ,
       note: "Veszettség elleni oltás beadva, minden rendben"
     }
   ]

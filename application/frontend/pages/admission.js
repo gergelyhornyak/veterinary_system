@@ -56,68 +56,69 @@ export default function AdmissionPage() {
     const [petCache, setPetCache] = useState([]);
 
     const speciesOptions = [
-        { value: 'kutya', label: 'Kutya' },
-        { value: 'macska', label: 'Macska', },
-        { value: 'nyúl', label: 'Nyúl', },
-        { value: 'hörcsög', label: 'Hörcsög', },
-        { value: 'görény', label: 'Görény', },
-        { value: 'tengerimalac', label: 'Tengerimalac', },
-        { value: 'teknős', label: 'Teknős', },
-        { value: 'sertés', label: 'Sertés', },
+        { value: 'kutya', label: 'kutya' },
+        { value: 'macska', label: 'macska', },
+        { value: 'nyúl', label: 'nyúl', },
+        { value: 'hörcsög', label: 'hörcsög', },
+        { value: 'görény', label: 'görény', },
+        { value: 'tengerimalac', label: 'tengerimalac', },
+        { value: 'teknős', label: 'teknős', },
+        { value: 'sertés', label: 'sertés', },
     ];
 
     const breedOptionsMap = {
         kutya: [
-            { value: 'keverék', label: 'Keverék', },
-            { value: 'labrador', label: 'Labrador' },
-            { value: 'német juhász', label: 'Német juhász', },
-            { value: 'golden retriever', label: 'Golden retriever', },
-            { value: 'puli', label: 'Puli', },
-            { value: 'beagle', label: 'Beagle', },
-            { value: 'bulldog', label: 'Bulldog', },
-            { value: 'husky', label: 'Husky', },
-            { value: 'tacskó', label: 'Tacskó', },
-            { value: 'rottweiler', label: 'Rottweiler' },
-            { value: 'border collie', label: 'Border Collie' },
-            { value: 'vizsla', label: 'Vizsla' },
+            { value: 'keverék', label: 'keverék', },
+            { value: 'labrador', label: 'labrador' },
+            { value: 'német juhász', label: 'német juhász', },
+            { value: 'golden retriever', label: 'golden retriever', },
+            { value: 'puli', label: 'puli', },
+            { value: 'beagle', label: 'beagle', },
+            { value: 'bulldog', label: 'bulldog', },
+            { value: 'husky', label: 'husky', },
+            { value: 'tacskó', label: 'tacskó', },
+            { value: 'rottweiler', label: 'rottweiler' },
+            { value: 'border collie', label: 'border collie' },
+            { value: 'vizsla', label: 'vizsla' },
         ],
         macska: [
-            { value: 'keverék', label: 'Keverék', },
-            { value: 'sziámi', label: 'Sziámi' },
-            { value: 'maine coon', label: 'Maine coon', },
-            { value: 'ragdoll', label: 'Ragdoll', },
-            { value: 'orosz kék', label: 'Orosz kék', },
+            { value: 'keverék', label: 'keverék', },
+            { value: 'házi', label: 'házi' },
+            { value: 'sziámi', label: 'sziámi' },
+            { value: 'maine coon', label: 'maine coon', },
+            { value: 'ragdoll', label: 'ragdoll', },
+            { value: 'orosz kék', label: 'orosz kék', },
         ],
         nyúl: [
-            { value: 'keverék', label: 'Keverék', },
-            { value: 'holland lop', label: 'Holland lop' },
-            { value: 'rex', label: 'Rex', },
-            { value: 'lengyel', label: 'Lengyel', },
-            { value: 'európai', label: 'Európai', },
+            { value: 'keverék', label: 'keverék', },
+            { value: 'holland lop', label: 'holland lop' },
+            { value: 'rex', label: 'rex', },
+            { value: 'lengyel', label: 'lengyel', },
+            { value: 'európai', label: 'európai', },
 
         ],
         tengerimalac: [
-            { value: 'keverék', label: 'Keverék', },
+            { value: 'keverék', label: 'keverék', },
         ],
         teknős: [
-            { value: 'keverék', label: 'Keverék', },
+            { value: 'keverék', label: 'keverék', },
         ],
         sertés: [
-            { value: 'keverék', label: 'Keverék', },
+            { value: 'keverék', label: 'keverék', },
         ],
     };
     const colourOptions = [
-        { value: 'barna', label: 'Barna' },
-        { value: 'sárga', label: 'Sárga', },
-        { value: 'fehér', label: 'Fehér', },
-        { value: 'fekete', label: 'Fekete', },
-        { value: 'trikolor', label: 'Trikolor', },
-        { value: 'bézs', label: 'Bézs', },
-        { value: 'pöttyös', label: 'Pöttyös', },
-        { value: 'szürke', label: 'Szürke', },
-        { value: 'fóka', label: 'Fóka', },
-        { value: 'foltos', label: 'Foltos', },
-        { value: 'csíkos', label: 'Csíkos', },
+        { value: 'barna', label: 'barna' },
+        { value: 'sárga', label: 'sárga', },
+        { value: 'fehér', label: 'fehér', },
+        { value: 'fekete', label: 'fekete', },
+        { value: 'trikolor', label: 'trikolor', },
+        { value: 'bézs', label: 'bézs', },
+        { value: 'pöttyös', label: 'pöttyös', },
+        { value: 'szürke', label: 'szürke', },
+        { value: 'fóka', label: 'fóka', },
+        { value: 'foltos', label: 'foltos', },
+        { value: 'csíkos', label: 'csíkos', },
     ];
     const breedOptions = breedOptionsMap[selectedSpecies?.value] || [];
 
@@ -169,7 +170,7 @@ export default function AdmissionPage() {
         setPetCache(petCache.filter((_, i) => i !== index));
     };
 
-        const handlePhotoChange = (e) => {
+    const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setPetPhoto(file);
@@ -235,10 +236,10 @@ export default function AdmissionPage() {
                 if (pet.photo) {
                     const formData = new FormData();
                     formData.append("file", pet.photo);
-                    const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`, { photo: formData }, {
-                        headers: { "Content-Type": "multipart/form-data" },
-                        withCredentials: true,
-                    });
+                    const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`,
+                        formData, 
+                        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true} 
+                    );
                     photoUrl = uploadRes.data.url;
                 }
                 const petRes = await axios.post(`${process.env.API_URL}/pet/register`, {

@@ -25,7 +25,7 @@ router.get("/all", async (req, res) => {
   res.json(photos);
 });
 
-router.post("/upload/photo", upload.single("file"), async (req, res) => {
+router.post("/upload", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -40,7 +40,7 @@ router.post("/upload/photo", upload.single("file"), async (req, res) => {
       path: photoPath,
       mimetype: req.file.mimetype,
       size: req.file.size,
-      createdAt: new Date(),
+      created: new Date(),
     });
 
     await newPhoto.save();

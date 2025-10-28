@@ -16,7 +16,8 @@ export default function TreatmentPage() {
     const [recordID, setRecordID] = useState("");
 
     const [treatmentNote, setTreatmentNote] = useState("");
-    const [petTreatment, setPetTreatment] = useState("");
+    const [petTreatment, setPetTreatment] = useState({});
+    const [petTreatmentDescr, setPetTreatmentDescr] = useState({});
 
     const [petRecord, setPetRecord] = useState([]);
 
@@ -35,18 +36,22 @@ export default function TreatmentPage() {
 
     const [activeFilter, setActiveFilter] = useState('all');
 
-    const [preview, setPreview] = useState(null);
-    const [file, setFile] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [uploading, setUploading] = useState(false);
+    const [petPhoto, setPetPhoto] = useState(null);
+    const [petPhotoPreview, setPetPhotoPreview] = useState(null);
 
     useEffect(() => {
         setLoading(true);
         if (pid) {
             setPetID(pid);
             const getPetRecord = async (pid) => {
+                let petRecordData = [];
                 const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/record`, { withCredentials: true });
-                setPetRecord(petRes.data);
+                
+                for (const record of petRes.data.recordIDs) {
+                    const recordRes = await axios.get(`${process.env.API_URL}/record/${record}/data`, { withCredentials: true });
+                    petRecordData.push(recordRes.data);
+                }
+                setPetRecord(petRecordData);
             }
             const getPetData = async (pid) => {
                 const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true });
@@ -75,19 +80,51 @@ export default function TreatmentPage() {
 
     const saveTreatment = async () => {
         try {
+            console.debug(petPhoto);
+            let photoUrl = null;
+            if (petPhoto) {
+                const formData = new FormData();
+                formData.append("file", petPhoto);
+                const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
+                );
+                photoUrl = uploadRes.data.url;
+            }
+            let recordIDTemp;
+            /*
+                petHistory
+                petSymptoms
+                petAnalysis
+                petTreatment
+                petSuggestion
+                treatmentNote
+            */
+            petTreatment = {
+                history: petHistory,
+                symptoms: petSymptoms,
+                analysis: petAnalysis,
+                treatment: petTreatmentDescr,
+                suggestion: petSuggestion,
+            }
             const recordRes = await axios.post(`${process.env.API_URL}/record/add`, {
-                pid: pid,
-                vaccination: selectedVaccine,
+                date: new Date().toISOString(),
+                type: activeFilter,
                 drug: selectedDrug,
                 treatment: petTreatment,
+                vaccination: selectedVaccine,
                 receipt: petMedicine,
-                note: treatmentNote
+                note: treatmentNote,
+                photo: photoUrl || ""
             }, { withCredentials: true });
             //const ownerUid = ownerRes.data.uid;
-            const recordID = recordRes.data.rid;
-            console.debug("recordID", recordID);
-            setRecordID(recordID);
-            console.debug("record saved", recordRes);
+            recordIDTemp = recordRes.data.rid;
+            console.debug("recordID: ", recordRes.data.rid);
+            setRecordID(recordRes.data.rid);
+            console.debug("record saved", recordRes.data.rid);
+            const petRes = await axios.post(`${process.env.API_URL}/pet/${pid}/update/record`, {
+                newRecordID: recordIDTemp} , { withCredentials: true });
+            console.debug("pet and record: ", recordRes.data.rid, petRes.data.pid);
         } catch (err) {
             console.error(err);
         }
@@ -131,54 +168,14 @@ export default function TreatmentPage() {
         return records.filter(record => record.type === activeFilter);
     };
 
-    const handleChange = (e) => {
-        const selectedFile = e.target.files?.[0];
-        if (selectedFile) handleFile(selectedFile);
-    };
-
-    const handleFile = (selectedFile) => {
-        if (!selectedFile.type.startsWith("image/")) {
-            alert("Please upload an image file.");
-            return;
-        }
-        setFile(selectedFile);
-        setPreview(URL.createObjectURL(selectedFile));
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = () => setIsDragging(false);
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const droppedFile = e.dataTransfer.files?.[0];
-        if (droppedFile) handleFile(droppedFile);
-    };
-
-    const handleUpload = async () => {
-        if (!file) return;
-        setUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-            const data = await res.json();
-            alert(`Upload successful: ${data.url}`);
-        } catch (err) {
-            console.error(err);
-            alert("Upload failed");
-        } finally {
-            setUploading(false);
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setPetPhoto(file);
+            setPetPhotoPreview(URL.createObjectURL(file));
         }
     };
+
 
     if (loading) return <></>;
 
@@ -194,7 +191,7 @@ export default function TreatmentPage() {
                     <section className="pet-info" style={{ "width": "90%" }}>
                         <p>
                             <strong>Tulajdonos:</strong> {ownerData.fullname} <br />
-                            <strong>Állat:</strong> {petData.name}, {petData.breed} {petData.species} - {petData.colour}, {petData.sex}, {" "}
+                            <strong>Állat:</strong> {petData.name}, {petData.breed.join(" ")} {petData.species} - {petData.colour.join("-")}, {petData.sex}, {" "}
                             <span className={petData?.neutralised ? "neutralised" : "not-neutralised"}>
                                 {petData?.neutralised ? "ivartalanított" : "ivaros"}
                             </span>
@@ -306,7 +303,7 @@ export default function TreatmentPage() {
                 <hr className="divider" />
 
                 <section className="form-section">
-                    <form onSubmit={saveTreatment} className="treatment-form">
+                    <form className="treatment-form"> {/*onSubmit={saveTreatment}*/}
                         {activeFilter == "treatment" &&
                             <>
                                 <div className="form-group">
@@ -333,49 +330,22 @@ export default function TreatmentPage() {
                                     />
                                 </div>
 
-                                <div className="form-group">
-                                    <div
-                                        onDragOver={handleDragOver}
-                                        onDragLeave={handleDragLeave}
-                                        onDrop={handleDrop}
-                                    >
-                                        <label className="text-gray-500 text-center">
-                                            {preview ? (
-                                                <img
-                                                    src={preview}
-                                                    alt="Preview"
-                                                    className="w-full h-full object-cover rounded-2xl"
-                                                />
-                                            ) : (
-                                                <>
-                                                    <p>Drag & Drop your image here</p>
-                                                    <p className="text-sm">or click to browse</p>
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        className="hidden"
-                                                        onChange={handleChange}
-                                                    />
-                                                </>
-                                            )}
-                                        </label>
-                                    </div>
-
-                                    {preview && (
-                                        <button
-                                            onClick={handleUpload}
-                                            disabled={uploading}
-                                        >
-                                            {uploading ? "Uploading..." : "Upload"}
-                                        </button>
+                                <div className="form-group"> 
+                                    <label>Fénykép</label>
+                                    <input type="file" accept="image/*" onChange={handlePhotoChange} />
+                                    {petPhotoPreview && (
+                                        <div style={{ marginTop: "10px" }}>
+                                            <img src={petPhotoPreview} alt="Pet preview" style={{ width: "250px", borderRadius: "10px" }} />
+                                        </div>
                                     )}
                                 </div>
+                                    
 
                                 <div className="form-group">
                                     <label>Kezelés</label>
                                     <textarea
-                                        value={petTreatment}
-                                        onChange={(e) => setPetTreatment(e.target.value)}
+                                        value={petTreatmentDescr}
+                                        onChange={(e) => setPetTreatmentDescr(e.target.value)}
                                     />
                                 </div>
 

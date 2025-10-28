@@ -30,8 +30,7 @@ router.get("/:pid/record", async (req, res) => {
     const pet = await Pet.findOne({pid:pid});
     if (!pet) return res.status(401).json({error:"Pet not found"});
     const recordIds = pet.record;
-    //const records = await Record.find({ rid: { $in: recordIds } });
-    res.status(200).json(recordIds);
+    res.status(200).json({recordIDs: recordIds});
   } catch (err) {
     console.error(err);
     res.status(401).json({error:"Not found pet record"});
@@ -41,7 +40,8 @@ router.get("/:pid/record", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { chipid, passportid, name, species, breed, colour, sex, neuter, alive, birthday
+    const { name, species, breed, colour, sex, 
+      neuter, alive, birthday, chipid, passportid, photoURL
        } = req.body;
     if (!name || !species) {
       return res.status(400).json({ error: "All fields are required" });
@@ -67,6 +67,7 @@ router.post("/register", async (req, res) => {
       alive: alive,
       birthday: birthday,
       registered: new Date().toISOString(),
+      photo: photoURL,
       record: []
     });
 
@@ -103,14 +104,12 @@ router.post("/:pid/update/info", async (req, res) => {
 router.post("/:pid/update/record", async (req, res) => {
   try {
     const { pid } = req.params;
-    const { records } = req.body;
+    const { newRecordID } = req.body;
     const pet = await Pet.findOne({pid:pid});
     if (!pet) return res.status(401).json({error:"Pet not found"});
     // add no changes detected section
-    if( records !== pet.record ) pet.record = records;
-    
+    pet.record.push(newRecordID);
     await pet.save();
-    
     res.status(200).json({message: "Pet updated successfully", pid: pet.pid});
   } catch (err) {
     console.error(err);

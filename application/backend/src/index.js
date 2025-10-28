@@ -36,6 +36,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
+
 // Routes
 app.use("/owner", ownerRoutes);
 app.use("/pet", petRoutes);
@@ -43,7 +45,7 @@ app.use("/drug", drugRoutes);
 app.use("/record", recordRoutes);
 app.use("/photo", photoRoutes);
 
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 
 app.get("/", (req, res) => res.json({ status: "ok", service: "backend"}));
 

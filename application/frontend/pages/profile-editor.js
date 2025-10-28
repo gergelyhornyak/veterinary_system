@@ -155,8 +155,36 @@ export default function ProfileEditorPage() {
             Állatok
           </h2>
           {pets && pets.map((pet, index) => (
-            <div key={pet.index} className="mb-4">
+            <div key={index} className="mb-4">
               <h3>{pet.name}, {pet.breed} {pet.species} </h3>
+
+              <button
+                onClick={async () => {
+                  if (confirm(`Biztosan törölni szeretnéd ${pet.name} adatait?`)) {
+                    try {
+                      // Optional: Call backend to delete pet
+                      await axios.post(`${process.env.API_URL}/owner/${owner.uid}/remove/pet`, { pet: pet.pid }, { withCredentials: true });
+
+                      // Remove from local state
+                      const updatedPets = pets.filter((_, i) => i !== index);
+                      setPets(updatedPets);
+                    } catch (err) {
+                      alert("Nem sikerült törölni az állatot");
+                    }
+                  }
+                }}
+                style={{
+                  backgroundColor: "#e63946",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                Állat eltávolítása
+              </button>
+
               <div className="">
                 Neve:
                 <input

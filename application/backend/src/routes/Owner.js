@@ -116,6 +116,23 @@ router.post("/:uid/update/pet", async (req, res) => {
   }
 });
 
+router.post("/:uid/remove/pet", async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { pet } = req.body;
+    const owner = await Owner.findOne({ uid: uid });
+    if (!owner) return res.status(401).json({ error: "Owner not found" });
+    console.debug(owner.pet, pet);
+    owner.pet = owner.pet.filter(p => p !== pet);
+    console.debug(owner.pet, pet);
+    await owner.save();
+    res.status(200).json({ message: "Pet removed successfully", uid: owner.uid, pid: pet });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: "Not found owner data" });
+  }
+});
+
 router.post("/:uid/update/debt", async (req, res) => {
   try {
     const { uid } = req.params;
