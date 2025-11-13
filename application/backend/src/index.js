@@ -13,6 +13,13 @@ import { connectDB } from "./config/db.js";
 
 import path from "path";
 
+import { fileURLToPath } from "url";
+
+// Recreate __dirname (since it's not available in ES modules)
+//const __filename = fileURLToPath(import.meta.url);
+//const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
+
 dotenv.config();    
 
 const app = express();
@@ -36,7 +43,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/owner", ownerRoutes);

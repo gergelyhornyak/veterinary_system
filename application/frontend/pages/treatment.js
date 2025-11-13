@@ -17,7 +17,7 @@ export default function TreatmentPage() {
 
     const [treatmentNote, setTreatmentNote] = useState("");
     const [petTreatment, setPetTreatment] = useState({});
-    const [petTreatmentDescr, setPetTreatmentDescr] = useState({});
+    const [petTreatmentDescr, setPetTreatmentDescr] = useState("");
 
     const [petRecord, setPetRecord] = useState([]);
 
@@ -83,7 +83,7 @@ export default function TreatmentPage() {
             console.debug(petPhoto);
             let photoUrl = null;
             if (petPhoto) {
-                const formData = new FormData();
+                let formData = new FormData();
                 formData.append("file", petPhoto);
                 const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`,
                     formData,
@@ -92,41 +92,39 @@ export default function TreatmentPage() {
                 photoUrl = uploadRes.data.url;
             }
             let recordIDTemp;
-            /*
-                petHistory
-                petSymptoms
-                petAnalysis
-                petTreatment
-                petSuggestion
-                treatmentNote
-            */
-            petTreatment = {
+            let petTreatmentTemp = {
                 history: petHistory,
                 symptoms: petSymptoms,
                 analysis: petAnalysis,
                 treatment: petTreatmentDescr,
                 suggestion: petSuggestion,
-            }
+            };
+
+            setPetTreatment(petTreatmentTemp);
+
             const recordRes = await axios.post(`${process.env.API_URL}/record/add`, {
                 date: new Date().toISOString(),
                 type: activeFilter,
                 drug: selectedDrug,
-                treatment: petTreatment,
+                treatment: petTreatmentTemp,
                 vaccination: selectedVaccine,
-                receipt: petMedicine,
+                receipt: "recept",
                 note: treatmentNote,
                 photo: photoUrl || ""
             }, { withCredentials: true });
             //const ownerUid = ownerRes.data.uid;
+
             recordIDTemp = recordRes.data.rid;
             console.debug("recordID: ", recordRes.data.rid);
             setRecordID(recordRes.data.rid);
             console.debug("record saved", recordRes.data.rid);
-            const petRes = await axios.post(`${process.env.API_URL}/pet/${pid}/update/record`, {
-                newRecordID: recordIDTemp} , { withCredentials: true });
+            const petRes = await axios.post(`${process.env.API_URL}/pet/${pid}/update/record`, 
+                {newRecordID: recordIDTemp} 
+                ,{ withCredentials: true });
             console.debug("pet and record: ", recordRes.data.rid, petRes.data.pid);
         } catch (err) {
             console.error(err);
+            alert(err);
         }
     };
 
@@ -247,16 +245,27 @@ export default function TreatmentPage() {
                                                 </div>
                                             )}
 
-                                            {r.type == "treatment" && r.treatment.length > 0 && (
+                                            {r.type == "treatment" && (
                                                 <div className="vaccination-list">
-                                                    <strong>Kezelések:</strong>
-                                                    <ul>
-                                                        {r.treatment.map((v, idx) => (
-                                                            <li key={idx} className="vaccination-item">
-                                                                <p>{v.notes}</p>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                    <strong>Kórelőzmény:</strong>
+                                                    <p>{r.treatment?.history}</p>
+                                                    <strong>Tünetek:</strong>
+                                                    <p>{r.treatment?.symptoms}</p>
+                                                    <strong>Vizsgálat:</strong>
+                                                    <p>{r.treatment?.analysis}</p>
+                                                    <strong>Kezelés:</strong>
+                                                    <p>{r.treatment?.treatment}</p>
+                                                    <strong>Javaslat:</strong>
+                                                    <p>{r.treatment?.suggestion}</p>
+                                                    <span>Megjegyzés: {r.note}</span>
+                                                    <p><strong>Fotó</strong></p>
+                                                    {r.photo ? (
+                                                        <div>
+                                                            <img src={`${process.env.API_URL}${r.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
+                                                        </div>
+                                                    ) : (
+                                                        <p>Nincs fotó</p>
+                                                    )}
                                                 </div>
                                             )}
 

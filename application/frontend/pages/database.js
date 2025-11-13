@@ -277,13 +277,15 @@ export default function Database() {
                                                             >
                                                                 Kórtörténet
                                                             </button>
-                                                            <button
-                                                                className="button secondary"
-                                                                onClick={() =>
-                                                                    router.push(`/treatment?pid=${pet.pid}&uid=${p.uid}`)}
-                                                            >
-                                                                Kezelem
-                                                            </button>
+                                                            {pet.alive && (
+                                                                <button
+                                                                    className="button secondary"
+                                                                    onClick={() =>
+                                                                        router.push(`/treatment?pid=${pet.pid}&uid=${p.uid}`)}
+                                                                >
+                                                                    Kezelem
+                                                                </button>
+                                                            )}   
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -325,47 +327,44 @@ export default function Database() {
                                                                     <div>{translate(record.type)}</div>
                                                                 </summary>
 
+                                                                {/* {record.photo && (
+                                                                    <div>
+                                                                        <strong>Kezelés kép:</strong>{" "}
+                                                                        <img src={`${process.env.API_URL}${record.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
+                                                                    </div>
+                                                                )} */}
                                                                 {record.vaccination && (
                                                                     <div>
                                                                         <strong>Oltások:</strong>{" "}
-                                                                        {record.vaccination.map((vax, idx) => (
-                                                                            <div key={idx}>
-                                                                                {vax.value}<br />
-                                                                            </div>
-                                                                        ))}
+                                                                        {JSON.stringify(record.vaccination)}
                                                                     </div>
                                                                 )}
                                                                 {record.treatment && (
                                                                     <div>
                                                                         <strong>Kezelés:</strong>{" "}
-                                                                        {record.treatment.map((treat, idx) => (
-                                                                            <div key={idx}>
-                                                                                {treat.symptoms}
-                                                                                {treat.treatment}
-                                                                                {treat.suggestion}
-                                                                            </div>
-                                                                        ))}
+                                                                        <p>kórtörténet: {(record.treatment.history)}</p>
+                                                                        <p>tünetek: {(record.treatment.symptoms)}</p>
+                                                                        <p>elemzés: {(record.treatment.analysis)}</p>
+                                                                        <p>kezelés: {(record.treatment.treatment)}</p>
+                                                                        <p>javaslat: {(record.treatment.suggestion)}</p>
                                                                     </div>
                                                                 )}
                                                                 {record.drug && (
                                                                     <div>
                                                                         <strong>Gyógyszerezés:</strong>{" "}
-                                                                        {record.drug.map((treat, idx) => (
-                                                                            <div key={idx}>{treat.value}</div>
-                                                                        ))}
+                                                                        {JSON.stringify(record.drug)}
                                                                     </div>
                                                                 )}
                                                                 {record.receipt  && (
                                                                     <div>
                                                                         <strong>Receptek:</strong>{" "}
-                                                                        {record.receipt.map((treat, idx) => (
-                                                                            <div key={idx}>{treat.value}</div>
-                                                                        ))}
+                                                                        {JSON.stringify(record.receipt)}
                                                                     </div>
                                                                 )}
                                                                 {record.note && (
                                                                     <div>
-                                                                        <strong>Megjegyzés:</strong> {record.note}
+                                                                        <strong>Megjegyzés:</strong>{" "}
+                                                                        {record.note}
                                                                     </div>
                                                                 )}
 

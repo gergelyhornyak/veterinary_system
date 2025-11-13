@@ -28,7 +28,7 @@ router.get("/:rid/data", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    const { date, type, drug, vaccination, treatment, receipt, note } = req.body;
+    const { date, type, drug, vaccination, treatment, receipt, note, photo } = req.body;
     if (!date || !type ) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -43,6 +43,7 @@ router.post("/add", async (req, res) => {
       receipt: receipt,
       vaccination: vaccination,
       treatment: treatment,
+      photo: photo,
       note: note
     });
 
@@ -55,7 +56,7 @@ router.post("/add", async (req, res) => {
   }
 });
 
-router.post("/export", async (req, res) => {
+router.get("/export", async (req, res) => {
   try {
     // Assuming Mongoose is already connected via connectDB.js
     const recordData = await Record.find().lean();
@@ -63,9 +64,9 @@ router.post("/export", async (req, res) => {
     const ownerData = await Owner.find().lean();
     const drugData = await Drug.find().lean();
 
-    const recordFields = ["date", "type", "note"]; 
-    const petFields = ["name", "species", "breed", "colour"]; 
-    const ownerFields = ["fullname", "address"]; 
+    const recordFields = ["rid","date", "type", "note"]; 
+    const petFields = ["pid","name", "species", "breed", "colour", "record"]; 
+    const ownerFields = ["uid","fullname", "address","pet"]; 
     const drugFields = ["label"];
 
     const recordCSV =  await json2csv(recordData, { keys: recordFields });
