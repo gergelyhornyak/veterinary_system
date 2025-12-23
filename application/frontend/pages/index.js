@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 
 
@@ -29,7 +30,7 @@ export default function Home() {
             <Link href={`/profile-editor`}><p className="menu-button">Adatok Szerkesztése</p></Link>
           </div>
           <div>
-            <Link href={`/picture`}><p className="menu-button">Kép Készítés</p></Link>
+            <Link href={`/picture`}><p className="menu-button"><s>Kép Készítés</s></p></Link>
           </div>
           <div>
             <Link href={`/export`}><p className="menu-button">Minden adat exportálása</p></Link>

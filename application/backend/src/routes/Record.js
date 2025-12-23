@@ -33,6 +33,8 @@ router.post("/add", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    //console.log("\nAdding record:", req.body,"\n");
+
     let uuid = crypto.randomUUID();
 
     const newRecord = new Record({
@@ -48,6 +50,7 @@ router.post("/add", async (req, res) => {
     });
 
     await newRecord.save();
+    console.log("Record added with RID:", uuid);
     res.status(201).json({ message: "Record added successfully", rid: uuid });
 
   } catch (err) {

@@ -3,6 +3,7 @@ import html2canvas from "html2canvas";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 
 export default function ExportPDF() {
@@ -31,15 +32,15 @@ export default function ExportPDF() {
     useEffect(() => {
         setLoading(true);
         const getPetRecords = async (pid) => {
-            const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/record`, { withCredentials: true });
+            const petRes = await axios.get(`${apiUrl()}/pet/${pid}/record`, { withCredentials: true });
             setPetRecords(petRes.data);
         }
         const getPetData = async (pid) => {
-            const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true });
+            const petRes = await axios.get(`${apiUrl()}/pet/${pid}/data`, { withCredentials: true });
             setPetData(petRes.data);
         }
         const getOwnerData = async (uid) => {
-            const ownerRes = await axios.get(`${process.env.API_URL}/patient/${uid}/data`, { withCredentials: true });
+            const ownerRes = await axios.get(`${apiUrl()}/patient/${uid}/data`, { withCredentials: true });
             setOwnerData(ownerRes.data);
         }
         getPetData(pid);

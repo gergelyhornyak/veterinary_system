@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 import { Bar, Line } from "react-chartjs-2";
 import {
@@ -33,7 +34,7 @@ export default function StatsPage() {
         const fetchRecords = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`${process.env.API_URL}/record/all`, { withCredentials: true });
+                const res = await axios.get(`${apiUrl()}/record/all`, { withCredentials: true });
                 setRecords(res.data);
             } catch (err) {
                 console.error("Error fetching records:", err);

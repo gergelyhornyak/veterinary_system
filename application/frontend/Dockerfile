@@ -21,5 +21,5 @@ RUN npm run build
 # Start Next.js server
 EXPOSE 3001
 # npx next telemetry disable
-CMD ["npm", "run", "dev"]
-#CMD ["npm", "run", "start"]
+#CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

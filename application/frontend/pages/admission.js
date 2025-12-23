@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -136,7 +137,7 @@ export default function AdmissionPage() {
 
         const fetchOwnerAndPetsData = async () => {
             try {
-                const ownerRes = await axios.get(`${process.env.API_URL}/owner/${uid}/data`, { withCredentials: true });
+                const ownerRes = await axios.get(`${apiUrl()}/owner/${uid}/data`, { withCredentials: true });
                 setOwnerData(ownerRes.data);
                 setOwnerFullName(ownerRes.data.fullname);
                 setOwnerAddress(ownerRes.data.address);
@@ -147,7 +148,7 @@ export default function AdmissionPage() {
                 const pets = ownerRes.data.pet || [];
                 const petsRes = await Promise.all(
                     pets.map(async (pid) => {
-                        const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true });
+                        const petRes = await axios.get(`${apiUrl()}/pet/${pid}/data`, { withCredentials: true });
                         return petRes.data;
                     })
                 );
@@ -236,13 +237,13 @@ export default function AdmissionPage() {
                 if (pet.photo) {
                     const formData = new FormData();
                     formData.append("file", pet.photo);
-                    const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`,
+                    const uploadRes = await axios.post(`${apiUrl()}/photo/upload`,
                         formData, 
                         { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true} 
                     );
                     photoUrl = uploadRes.data.url;
                 }
-                const petRes = await axios.post(`${process.env.API_URL}/pet/register`, {
+                const petRes = await axios.post(`${apiUrl()}/pet/register`, {
                     chipid: pet.chipid,
                     name: pet.name,
                     species: pet.species,
@@ -266,7 +267,7 @@ export default function AdmissionPage() {
             // If new owner:
             if (!existingOwner) {
                 console.debug("Registering new owner");
-                const ownerRes = await axios.post(`${process.env.API_URL}/owner/register`, {
+                const ownerRes = await axios.post(`${apiUrl()}/owner/register`, {
                     fullname: ownerFullName,
                     mobile: ownerMobile,
                     email: ownerEmail,
@@ -278,7 +279,7 @@ export default function AdmissionPage() {
 
                 // Attach each pet
                 for (const pid of newPetIDs) {
-                    await axios.post(`${process.env.API_URL}/owner/${newUID}/update/pet`, {
+                    await axios.post(`${apiUrl()}/owner/${newUID}/update/pet`, {
                         newPet: pid
                     }, { withCredentials: true });
                 }
@@ -289,7 +290,7 @@ export default function AdmissionPage() {
                 // Existing owner, add pets
                 const currentUID = ownerID || ownerData.uid;
                 for (const pid of newPetIDs) {
-                    await axios.post(`${process.env.API_URL}/owner/${currentUID}/update/pet`, {
+                    await axios.post(`${apiUrl()}/owner/${currentUID}/update/pet`, {
                         newPet: pid
                     }, { withCredentials: true });
                 }
@@ -320,9 +321,10 @@ export default function AdmissionPage() {
 
     return (
         <div>
-            <main style={{ "margin": "0% 20%" }}>
+            <main style={{ "margin": "0% 16%" }}>
                 <div>
                     <header className="header">
+
                         <Link href={`/`}><h2>Főoldal</h2></Link>
 
                         <h1 className="title">Tulajdonos és állata felvétele</h1>
@@ -496,24 +498,19 @@ export default function AdmissionPage() {
                             </div>
                             <button type="submit" disabled={saving2}>{saving2 ? "Mentés..." : "Állat felvétel"}</button>
                         </form>
-
-                        {petCache.length > 0 && (
-                            <div>
-                                <h3>Hozzáadott állatok:</h3>
-                                <ul>
-                                    {petCache.map((pet, index) => (
-                                        <li key={index}>
-                                            {pet.name}, ({pet.breed.join("-")} {pet.species})
-                                            {pet.photoPreview && (
-                                                <img src={pet.photoPreview} alt="preview" style={{ width: "50px", marginLeft: "10px" }} />
-                                            )}
-                                            <button onClick={() => handleRemovePet(index)}>Visszavon</button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
                     </div>
+
+                    <div className="pet-cache">
+                        <h3>Felvett állatok:</h3>
+                        {petCache.length === 0 && <p>Nincs felvett állat.</p>}
+                        {petCache.map((pet, index) => (
+                            <div key={index} className="pet-cache-item">
+                                <strong>{pet.name}</strong> ({pet.breed.join(", ")} {pet.species})
+                                <button onClick={() => handleRemovePet(index)}>Eltávolít</button>
+                            </div>
+                        ))}
+                    </div>
+
                 </div>
             </main>
         </div>

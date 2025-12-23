@@ -26,7 +26,7 @@ db.owners.insertMany(
     },
     {
       uid: "52c1a2d0-14f7-4a43-a3d1-1b0f9d2dbfc8",
-      fullname: "Horváth Etelka",
+      fullname: "Dr. Horváth Etelka",
       mobile: "+36309876543",
       email: "szabo.katalin@gmail.com",
       debt: 0,
@@ -349,7 +349,7 @@ db.pets.insertMany(
       name: "Rex",
       species: "kutya",
       breed: ["német juhász"],
-      colour: ["fekete","barna"],
+      colour: ["fekete", "barna"],
       sex: "hím",
       birthday: "2014-12-10",
       record: [],
@@ -407,7 +407,7 @@ db.pets.insertMany(
       name: "Folti",
       species: "kutya",
       breed: ["dalmata"],
-      colour: ["fehér","fekete"],
+      colour: ["fehér", "fekete"],
       sex: "hím",
       birthday: "2012-08-15",
       record: [],
@@ -433,7 +433,7 @@ db.pets.insertMany(
       name: "Picur",
       species: "kutya",
       breed: ["yorkshire terrier"],
-      colour: ["arany","barna"],
+      colour: ["arany", "barna"],
       sex: "nőstény",
       birthday: "2019-10-03",
       record: [],
@@ -446,7 +446,7 @@ db.pets.insertMany(
       name: "Sámson",
       species: "kutya",
       breed: ["bernipásztor"],
-      colour: ["fekete","fehér","barna"],
+      colour: ["fekete", "fehér", "barna"],
       sex: "hím",
       birthday: "2016-02-17",
       record: [],
@@ -459,7 +459,7 @@ db.pets.insertMany(
       name: "Pille",
       species: "macska",
       breed: ["házi"],
-      colour: ["fehér","cirmos"],
+      colour: ["fehér", "cirmos"],
       sex: "nőstény",
       birthday: "2021-12-08",
       record: [],
@@ -471,7 +471,7 @@ db.pets.insertMany(
       chipid: "985141000554433",
       name: "Max",
       species: "kutya",
-      breed: ["golden retriever","keverék"],
+      breed: ["golden retriever", "keverék"],
       colour: ["arany"],
       sex: "hím",
       birthday: "2018-07-27",
@@ -485,7 +485,7 @@ db.pets.insertMany(
       name: "Cuki",
       species: "hörcsög",
       breed: ["törpehörcsög"],
-      colour: ["szürke","fehér"],
+      colour: ["szürke", "fehér"],
       sex: "nőstény",
       birthday: "2023-03-14",
       record: [],
@@ -498,7 +498,7 @@ db.pets.insertMany(
       name: "Frakk",
       species: "kutya",
       breed: ["vizsla"],
-      colour: ["barna","foltos"],
+      colour: ["barna", "foltos"],
       sex: "hím",
       birthday: "2015-05-01",
       record: [],
@@ -511,7 +511,7 @@ db.pets.insertMany(
       name: "Panna",
       species: "macska",
       breed: ["maine coon"],
-      colour: ["vörös","cirmos"],
+      colour: ["vörös", "cirmos"],
       sex: "nőstény",
       birthday: "2020-09-09",
       record: [],
@@ -524,7 +524,7 @@ db.pets.insertMany(
       name: "Bogyó",
       species: "nyúl",
       breed: ["holland törpenyúl"],
-      colour: ["fekete","fehér"],
+      colour: ["fekete", "fehér"],
       sex: "hím",
       birthday: "2022-11-22",
       record: [],
@@ -537,7 +537,7 @@ db.pets.insertMany(
       name: "Szellő",
       species: "kutya",
       breed: ["whippet"],
-      colour: ["szürke","fehér"],
+      colour: ["szürke", "fehér"],
       sex: "nőstény",
       birthday: "2017-04-05",
       record: [],
@@ -550,7 +550,7 @@ db.pets.insertMany(
       name: "Cirmoska",
       species: "macska",
       breed: ["házi"],
-      colour: ["csíkos","fehér"],
+      colour: ["csíkos", "fehér"],
       sex: "hím",
       birthday: "2019-01-30",
       record: [],
@@ -566,16 +566,21 @@ db.records.insertMany(
       rid: "7a1b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
       date: "2023-07-15T14:22:33Z",
       type: "vaccination",
-      vaccination: 
-      { value: "NOBIVAC TRICAT", label: "NOBIVAC TRICAT" },
+      vaccination: [
+        { value: "NOBIVAC TRICAT", label: "NOBIVAC TRICAT" },
+        { value: "NOBIVAC RABIES", label: "NOBIVAC RABIES" }
+      ],
       note: "Védőoltás beadva, enyhe láz jelentkezett, pihenés javasolt"
     },
     {
       rid: "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
       date: "2023-08-22T10:15:00Z",
       type: "drug",
-      drug: 
-      { value: "CLAVUDALE TABL. 250 MG", label: "CLAVUDALE TABL. 250 MG", note: "2x1 naponta, étkezés után" },
+      drug: [
+        {
+          value: "CLAVUDALE TABL. 250 MG", label: "CLAVUDALE TABL. 250 MG", note: "2x1 naponta, étkezés után"
+        }
+      ],
       note: "Bőrgyulladás kezelése, antibiotikum kúra megkezdve"
     },
     {
@@ -583,14 +588,20 @@ db.records.insertMany(
       date: "2023-09-05T16:45:12Z",
       type: "treatment",
       treatment:
-        { notes: "Fogkőeltávolítás elvégezve" },
+      {
+        history: "beteg volt 2 hétig, étvágytalan, levertség",
+        symptoms: "hányás, hasmenés",
+        analysis: "vérvizsgálat, ultrahang",
+        treatment: "infúzió, gyógyszeres kezelés",
+        suggestion: "pihenés, könnyű étkezés",
+      },
       note: "Szájhigiénia rendben, kontroll 6 hónap múlva esedékes"
     },
     {
       rid: "4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s",
       date: "2023-10-18T11:30:45Z",
       type: "receipt",
-      receipt: 
+      receipt:
         { value: "APTUS NUTRISAL", label: "APTUS NUTRISAL" }
       ,
       note: "Folyadékpótlás és vitaminok felírva, hasmenés miatt"
@@ -599,54 +610,63 @@ db.records.insertMany(
       rid: "5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t",
       date: "2023-11-30T09:20:15Z",
       type: "drug",
-      drug: 
-        { value: "KEFAVET TABL. 500 MG", label: "KEFAVET TABL. 500 MG", note: "1x1 reggel" }
-      ,
+      drug: [
+        {
+          value: "KEFAVET TABL. 500 MG", label: "KEFAVET TABL. 500 MG", note: "1x1 reggel"
+        }
+      ],
       note: "Húgyúti fertőzés kezelése, sok folyadék fogyasztása javasolt"
     },
     {
       rid: "6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t1u",
       date: "2023-12-12T13:40:22Z",
       type: "vaccination",
-      vaccination: 
+      vaccination: [
         { value: "VERSICAN DHPPI/L4", label: "VERSICAN DHPPI/L4" }
-      ,
+      ],
       note: "Éves oltás beadva, kutya jól viselte"
     },
     {
       rid: "7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u2v",
       date: "2024-01-25T15:55:33Z",
       type: "treatment",
-      treatment: 
-        { notes: "Fültisztítás és mintavétel" }
-      ,
+      treatment:
+      {
+        history: "beteg volt 2 hétig, étvágytalan, levertség",
+        symptoms: "hányás, hasmenés",
+        analysis: "vérvizsgálat, ultrahang",
+        treatment: "infúzió, gyógyszeres kezelés",
+        suggestion: "pihenés, könnyű étkezés",
+      },
       note: "Középfülgyulladás gyanúja, további vizsgálatok szükségesek"
     },
     {
       rid: "8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v3w",
       date: "2024-02-08T10:10:10Z",
       type: "receipt",
-      receipt: 
-        { value: "OTODINE 100 ML", label: "OTODINE 100 ML" }
-      ,
+      receipt:
+      {
+        value: "OTODINE 100 ML",
+        label: "OTODINE 100 ML"
+      },
       note: "Fülcseppek felírva, napi kétszeri alkalmazás javasolt"
     },
     {
       rid: "9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2v3w4x",
       date: "2024-03-17T14:15:00Z",
       type: "drug",
-      drug: 
+      drug: [
         { value: "RHEUMOCAM TABL. 2,5 MG", label: "RHEUMOCAM TABL. 2,5 MG", note: "1x1 délben" }
-      ,
+      ],
       note: "Ízületi gyulladás kezelése, mozgás mérséklése javasolt"
     },
     {
       rid: "0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x5y",
       date: "2024-04-01T11:25:45Z",
       type: "vaccination",
-      vaccination: 
+      vaccination: [
         { value: "NOBIVAC RABIES", label: "NOBIVAC RABIES" }
-      ,
+      ],
       note: "Veszettség elleni oltás beadva, minden rendben"
     }
   ]

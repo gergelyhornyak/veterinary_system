@@ -3,6 +3,7 @@ import { useState, useEffect, DragEvent, ChangeEvent } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Select from 'react-select';
+import { apiUrl } from "../lib/api";
 
 export default function TreatmentPage() {
     const router = useRouter();
@@ -45,21 +46,21 @@ export default function TreatmentPage() {
             setPetID(pid);
             const getPetRecord = async (pid) => {
                 let petRecordData = [];
-                const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/record`, { withCredentials: true });
+                const petRes = await axios.get(`${apiUrl()}/pet/${pid}/record`, { withCredentials: true });
                 
                 for (const record of petRes.data.recordIDs) {
-                    const recordRes = await axios.get(`${process.env.API_URL}/record/${record}/data`, { withCredentials: true });
+                    const recordRes = await axios.get(`${apiUrl()}/record/${record}/data`, { withCredentials: true });
                     petRecordData.push(recordRes.data);
                 }
                 setPetRecord(petRecordData);
             }
             const getPetData = async (pid) => {
-                const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true });
+                const petRes = await axios.get(`${apiUrl()}/pet/${pid}/data`, { withCredentials: true });
 
                 setPetData(petRes.data);
             }
             const getDrugs = async () => {
-                const drugRes = await axios.get(`${process.env.API_URL}/drug/all`, { withCredentials: true });
+                const drugRes = await axios.get(`${apiUrl()}/drug/all`, { withCredentials: true });
                 setDrugOptions(drugRes.data);
             }
             getPetData(pid);
@@ -69,7 +70,7 @@ export default function TreatmentPage() {
         if (uid) {
             setOwnerID(uid);
             const getOwnerData = async (uid) => {
-                const ownerRes = await axios.get(`${process.env.API_URL}/owner/${uid}/data`, { withCredentials: true });
+                const ownerRes = await axios.get(`${apiUrl()}/owner/${uid}/data`, { withCredentials: true });
 
                 setOwnerData(ownerRes.data);
             }
@@ -85,13 +86,16 @@ export default function TreatmentPage() {
             if (petPhoto) {
                 let formData = new FormData();
                 formData.append("file", petPhoto);
-                const uploadRes = await axios.post(`${process.env.API_URL}/photo/upload`,
+                const uploadRes = await axios.post(`${apiUrl()}/photo/upload`,
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
                 );
                 photoUrl = uploadRes.data.url;
             }
-            let recordIDTemp;
+            let petReceipt = {
+                medicine: petMedicine,
+                food: petFood,
+            };
             let petTreatmentTemp = {
                 history: petHistory,
                 symptoms: petSymptoms,
@@ -102,26 +106,24 @@ export default function TreatmentPage() {
 
             setPetTreatment(petTreatmentTemp);
 
-            const recordRes = await axios.post(`${process.env.API_URL}/record/add`, {
+            const recordRes = await axios.post(`${apiUrl()}/record/add`, {
                 date: new Date().toISOString(),
                 type: activeFilter,
                 drug: selectedDrug,
                 treatment: petTreatmentTemp,
                 vaccination: selectedVaccine,
-                receipt: "recept",
+                receipt: petReceipt,
                 note: treatmentNote,
                 photo: photoUrl || ""
             }, { withCredentials: true });
-            //const ownerUid = ownerRes.data.uid;
 
-            recordIDTemp = recordRes.data.rid;
-            console.debug("recordID: ", recordRes.data.rid);
+            let recordIDTemp = recordRes.data.rid;
+            console.log("New record ID:", recordIDTemp);
             setRecordID(recordRes.data.rid);
-            console.debug("record saved", recordRes.data.rid);
-            const petRes = await axios.post(`${process.env.API_URL}/pet/${pid}/update/record`, 
+            const petRes = await axios.post(`${apiUrl()}/pet/${pid}/update/record`, 
                 {newRecordID: recordIDTemp} 
                 ,{ withCredentials: true });
-            console.debug("pet and record: ", recordRes.data.rid, petRes.data.pid);
+            console.log("pet and record: ", recordRes.data.rid, petRes.data.pid);
         } catch (err) {
             console.error(err);
             alert(err);
@@ -154,7 +156,7 @@ export default function TreatmentPage() {
         } else if (type == "treatment") {
             return "kezelés";
         } else if (type == "drug") {
-            return "gyógyszerezés";
+            return "gyógyszer";
         } else if (type == "receipt") {
             return "recept";
         }
@@ -205,12 +207,12 @@ export default function TreatmentPage() {
                             <button
                                 className={`filter-button ${activeFilter === 'vaccination' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('vaccination')}>
-                                Oltások
+                                Oltás
                             </button>
                             <button
                                 className={`filter-button ${activeFilter === 'drug' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('drug')}>
-                                Gyógyszerezés
+                                Gyógyszer
                             </button>
                             <button
                                 className={`filter-button ${activeFilter === 'receipt' ? 'active' : ''}`}
@@ -261,7 +263,7 @@ export default function TreatmentPage() {
                                                     <p><strong>Fotó</strong></p>
                                                     {r.photo ? (
                                                         <div>
-                                                            <img src={`${process.env.API_URL}${r.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
+                                                            <img src={`${apiUrl()}${r.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
                                                         </div>
                                                     ) : (
                                                         <p>Nincs fotó</p>
@@ -271,7 +273,7 @@ export default function TreatmentPage() {
 
                                             {r.type == "drug" && r.drug.length > 0 && (
                                                 <div className="vaccination-list">
-                                                    <strong>Gyógyszerezés:</strong>
+                                                    <strong>Gyógyszer:</strong>
                                                     <ul>
                                                         {r.drug.map((v, idx) => (
                                                             <li key={idx} className="vaccination-item">
@@ -284,7 +286,7 @@ export default function TreatmentPage() {
 
                                             {r.type == "receipt" && r.receipt.length > 0 && (
                                                 <div className="vaccination-list">
-                                                    <strong>Receptek:</strong>
+                                                    <strong>Recept:</strong>
                                                     <ul>
                                                         {r.receipt.map((v, idx) => (
                                                             <li key={idx} className="vaccination-item">
@@ -312,7 +314,7 @@ export default function TreatmentPage() {
                 <hr className="divider" />
 
                 <section className="form-section">
-                    <form className="treatment-form"> {/*onSubmit={saveTreatment}*/}
+                    <form className="treatment-form">
                         {activeFilter == "treatment" &&
                             <>
                                 <div className="form-group">
@@ -404,6 +406,9 @@ export default function TreatmentPage() {
                                         placeholder="javallat"
                                         onChange={(e) => {
                                             // Handle textarea change for each drug if needed
+                                            const updatedDrugs = [...selectedDrug];
+                                            updatedDrugs[index].note = e.target.value;
+                                            setSelectedDrug(updatedDrugs);
                                         }}
                                     />
                                 </div>

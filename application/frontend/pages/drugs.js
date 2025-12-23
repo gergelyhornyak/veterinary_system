@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 import Select from 'react-select';
 
@@ -18,7 +19,7 @@ export default function DrugsManagement() {
         setLoading(true);
         try {
             const getDrugs = async () => {
-                const drugRes = await axios.get(`${process.env.API_URL}/drug/all`, { withCredentials: true });
+                const drugRes = await axios.get(`${apiUrl()}/drug/all`, { withCredentials: true });
                 setDrugOptions(drugRes.data);
             }
             getDrugs();

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 
 export default function ProfileEditorPage() {
@@ -22,7 +23,7 @@ export default function ProfileEditorPage() {
       setLoading(true);
       setError(null);
       try {
-        const ownerRes = await axios.get(`${process.env.API_URL}/owner/${uid}/data`, { withCredentials: true });
+        const ownerRes = await axios.get(`${apiUrl()}/owner/${uid}/data`, { withCredentials: true });
         if (cancelled) return;
         setOwner(ownerRes.data);
 
@@ -34,7 +35,7 @@ export default function ProfileEditorPage() {
 
         // fetch all pets in parallel and set state once
         const petPromises = petIds.map((pid) =>
-          axios.get(`${process.env.API_URL}/pet/${pid}/data`, { withCredentials: true }).then(res => res.data)
+          axios.get(`${apiUrl()}/pet/${pid}/data`, { withCredentials: true }).then(res => res.data)
         );
         const petsData = await Promise.all(petPromises);
 
@@ -60,7 +61,7 @@ export default function ProfileEditorPage() {
       setSaving(true);
       setError(null);
 
-      const ownerRes = await axios.post(`${process.env.API_URL}/owner/${uid}/update`, {
+      const ownerRes = await axios.post(`${apiUrl()}/owner/${uid}/update`, {
         fullname: owner.fullname,
         address: owner.address,
         mobile: owner.mobile,
@@ -163,7 +164,7 @@ export default function ProfileEditorPage() {
                   if (confirm(`Biztosan törölni szeretnéd ${pet.name} adatait?`)) {
                     try {
                       // Optional: Call backend to delete pet
-                      await axios.post(`${process.env.API_URL}/owner/${owner.uid}/remove/pet`, { pet: pet.pid }, { withCredentials: true });
+                      await axios.post(`${apiUrl()}/owner/${owner.uid}/remove/pet`, { pet: pet.pid }, { withCredentials: true });
 
                       // Remove from local state
                       const updatedPets = pets.filter((_, i) => i !== index);

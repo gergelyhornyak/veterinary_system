@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { apiUrl } from "../lib/api";
 import Link from "next/link";
 
 export default function Database() {
@@ -31,8 +32,8 @@ export default function Database() {
             setLoading(true);
             try {
                 const [patientRes, petRes] = await Promise.all([
-                    axios.get(`${process.env.API_URL}/owner/all`, { withCredentials: true }),
-                    axios.get(`${process.env.API_URL}/pet/all`, { withCredentials: true })
+                    axios.get(`${apiUrl()}/owner/all`, { withCredentials: true }),
+                    axios.get(`${apiUrl()}/pet/all`, { withCredentials: true })
                 ]);
                 //console.debug(patientRes.data,petRes.data);
                 setListOfPatients(patientRes.data);
@@ -111,11 +112,11 @@ export default function Database() {
             let petRecordData = [];
             setPetDataLoading(true);
             setPetRecordIDs(null);
-            const petRes = await axios.get(`${process.env.API_URL}/pet/${pid}/record`, { withCredentials: true });
+            const petRes = await axios.get(`${apiUrl()}/pet/${pid}/record`, { withCredentials: true });
             console.debug(petRes.data);
             setPetRecordIDs(petRes.data.recordIDs);
             for (const record of petRes.data.recordIDs) {
-                const recordRes = await axios.get(`${process.env.API_URL}/record/${record}/data`, { withCredentials: true });
+                const recordRes = await axios.get(`${apiUrl()}/record/${record}/data`, { withCredentials: true });
                 petRecordData.push(recordRes.data);
             }
             setPetRecords(petRecordData);
@@ -141,13 +142,13 @@ export default function Database() {
         try {
             const targetUID = debtOwnerID;
             const res = await axios.post(
-                `${process.env.API_URL}/owner/${targetUID}/update/debt`,
+                `${apiUrl()}/owner/${targetUID}/update/debt`,
                 { amount: 0 },
                 { withCredentials: true }
             );
             console.log("Debt payment response:", res.data);
             // Refresh patient list to reflect updated debt
-            const patientRes = await axios.get(`${process.env.API_URL}/owner/all`, { withCredentials: true });
+            const patientRes = await axios.get(`${apiUrl()}/owner/all`, { withCredentials: true });
             setListOfPatients(patientRes.data);
             alert("Tartozás sikeresen rendezve.");
         } catch (err) {
@@ -330,7 +331,7 @@ export default function Database() {
                                                                 {/* {record.photo && (
                                                                     <div>
                                                                         <strong>Kezelés kép:</strong>{" "}
-                                                                        <img src={`${process.env.API_URL}${record.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
+                                                                        <img src={`${apiUrl()}${record.photo}`} alt="Record Photo" style={{ maxWidth: "300px", borderRadius: "10px" }} />
                                                                     </div>
                                                                 )} */}
                                                                 {record.vaccination && (

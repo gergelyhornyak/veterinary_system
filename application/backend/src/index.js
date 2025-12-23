@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: `${process.env.DOMAIN}:3001`, // Next.js frontend
+  origin: [ `${process.env.DOMAIN}:3001`, process.env.DOMAIN ], // allow frontend with or without port
   credentials: true,
 }));
 app.use(express.json());
@@ -56,4 +56,4 @@ app.use("/photo", photoRoutes);
 
 app.get("/", (req, res) => res.json({ status: "ok", service: "backend"}));
 
-app.listen(PORT, () => console.debug(`✅ Backend running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0',() => console.debug(`✅ Backend running on port ${PORT}`));

@@ -8,15 +8,37 @@ export default function ExportData() {
 
     }, []);
 
+    const handleExport = async () => {
+        const response = await fetch(`${apiUrl()}/record/export`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                // Include if using auth
+                // Authorization: `Bearer ${token}`,
+            },
+            credentials: "include", // if using cookies
+        });
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "export.csv";
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div>
             <main>
                 <h1>Adatok Exportálása</h1>
-                <p>Az összes adat exportálása CSV (Excel) fájlba.</p>
-                <a href={`${process.env.API_URL}/record/export`} download="export.csv">
-                    <button className="export-button">Adatok letöltése</button>
-                </a>
-                <p className="footer">&copy; 2025 Felsőgödi Kisállatrendelő. Minden jog fenntartva.</p>
+                <div style={{ justifyContent: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <p>Az összes adat exportálása CSV (Excel) fájlba.</p>
+                    <button className="export-button" onClick={handleExport}>
+                        Adatok letöltése
+                    </button>
+                    <p className="footer">&copy; 2025 Felsőgödi Kisállatrendelő. Minden jog fenntartva.</p>
+                </div>
             </main>
         </div>
     );
