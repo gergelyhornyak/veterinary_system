@@ -17,7 +17,7 @@ EXPOSE 27017
 ENV TZ="Europe/Budapest"
 
 # Start MongoDB (default CMD of base image)
-CMD ["mongod"]
+CMD ["mongod", "--quiet"]
 
 # sudo docker exec -it mongodb bash
 # mongosh -u root -p rootpass

@@ -1,9 +1,10 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, DragEvent, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Select from 'react-select';
 import { apiUrl } from "../lib/api";
+import { toast } from "react-toastify";
 
 export default function TreatmentPage() {
     const router = useRouter();
@@ -47,7 +48,7 @@ export default function TreatmentPage() {
             const getPetRecord = async (pid) => {
                 let petRecordData = [];
                 const petRes = await axios.get(`${apiUrl()}/pet/${pid}/record`, { withCredentials: true });
-                
+
                 for (const record of petRes.data.recordIDs) {
                     const recordRes = await axios.get(`${apiUrl()}/record/${record}/data`, { withCredentials: true });
                     petRecordData.push(recordRes.data);
@@ -81,22 +82,21 @@ export default function TreatmentPage() {
 
     const saveTreatment = async () => {
         try {
-            console.debug(petPhoto);
-            let photoUrl = null;
+            // 1. Handle Photo Upload
+            let photoUrl = "";
             if (petPhoto) {
-                let formData = new FormData();
+                const formData = new FormData();
                 formData.append("file", petPhoto);
-                const uploadRes = await axios.post(`${apiUrl()}/photo/upload`,
-                    formData,
-                    { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
-                );
-                photoUrl = uploadRes.data.url;
+                const uploadRes = await axios.post(`${apiUrl()}/photo/upload`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    withCredentials: true
+                });
+                photoUrl = uploadRes.data?.url || "";
             }
-            let petReceipt = {
-                medicine: petMedicine,
-                food: petFood,
-            };
-            let petTreatmentTemp = {
+
+            // 2. Prepare Data Objects
+            const petReceipt = { medicine: petMedicine, food: petFood };
+            const petTreatmentTemp = {
                 history: petHistory,
                 symptoms: petSymptoms,
                 analysis: petAnalysis,
@@ -104,8 +104,10 @@ export default function TreatmentPage() {
                 suggestion: petSuggestion,
             };
 
+            // Update local state (will reflect on NEXT render)
             setPetTreatment(petTreatmentTemp);
 
+            // 3. Create Record
             const recordRes = await axios.post(`${apiUrl()}/record/add`, {
                 date: new Date().toISOString(),
                 type: activeFilter,
@@ -114,19 +116,46 @@ export default function TreatmentPage() {
                 vaccination: selectedVaccine,
                 receipt: petReceipt,
                 note: treatmentNote,
-                photo: photoUrl || ""
+                photo: photoUrl
             }, { withCredentials: true });
 
-            let recordIDTemp = recordRes.data.rid;
-            console.log("New record ID:", recordIDTemp);
-            setRecordID(recordRes.data.rid);
-            const petRes = await axios.post(`${apiUrl()}/pet/${pid}/update/record`, 
-                {newRecordID: recordIDTemp} 
-                ,{ withCredentials: true });
-            console.log("pet and record: ", recordRes.data.rid, petRes.data.pid);
+            // CRITICAL: Check if we actually got an ID back
+            const newRID = recordRes.data?.rid;
+            if (!newRID) {
+                throw new Error("Failed to retrieve Record ID from server.");
+            }
+
+            console.log("New record ID confirmed:", newRID);
+            setRecordID(newRID); // Update state for UI
+
+            console.log("Attempting pet update. PID:", pid, "New Record ID:", newRID);
+
+            if (!pid || !newRID) {
+                console.error("Missing required data for pet update");
+            }
+
+            try {
+                // ISSUE: Sometimes this request fails silently - because for the first time, the record isnt added
+                // FIX: check records initial stage
+                const petRes = await axios.post(`${apiUrl()}/pet/${pid}/update/record`, 
+                    { newRecordID: newRID }, 
+                    { withCredentials: true }
+                );
+                console.log("Pet Update Result:", petRes.data);
+            } catch (err) {
+                // This will tell you if the server actually responded or if the request failed to send
+                console.error("Pet Update Failed. Response:", err.response?.data);
+            }
+
+            console.log("Success! Pet and record linked:", newRID, petRes.data?.pid);
+            alert("Treatment saved successfully!");
+            toast.success("Treatment saved successfully!");
+
         } catch (err) {
-            console.error(err);
-            alert(err);
+            console.error("Save Treatment Error:", err);
+            // More descriptive error handling
+            const errorMsg = err.response?.data?.message || err.message || "An unknown error occurred";
+            alert(`Error: ${errorMsg}`);
         }
     };
 
@@ -341,7 +370,7 @@ export default function TreatmentPage() {
                                     />
                                 </div>
 
-                                <div className="form-group"> 
+                                <div className="form-group">
                                     <label>Fénykép</label>
                                     <input type="file" accept="image/*" onChange={handlePhotoChange} />
                                     {petPhotoPreview && (
@@ -350,7 +379,7 @@ export default function TreatmentPage() {
                                         </div>
                                     )}
                                 </div>
-                                    
+
 
                                 <div className="form-group">
                                     <label>Kezelés</label>
