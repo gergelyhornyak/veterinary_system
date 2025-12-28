@@ -20,6 +20,7 @@ export default function TreatmentPage() {
     const [treatmentNote, setTreatmentNote] = useState("");
     const [petTreatment, setPetTreatment] = useState({});
     const [petTreatmentDescr, setPetTreatmentDescr] = useState("");
+    const [treatmentDate, setTreatmentDate] = useState(new Date().toISOString().split("T")[0]);
 
     const [petRecord, setPetRecord] = useState([]);
 
@@ -109,7 +110,7 @@ export default function TreatmentPage() {
 
             // 3. Create Record
             const recordRes = await axios.post(`${apiUrl()}/record/add`, {
-                date: new Date().toISOString(),
+                date: treatmentDate,
                 type: activeFilter,
                 drug: selectedDrug,
                 treatment: petTreatmentTemp,
@@ -344,6 +345,7 @@ export default function TreatmentPage() {
 
                 <section className="form-section">
                     <form className="treatment-form">
+
                         {activeFilter == "treatment" &&
                             <>
                                 <div className="form-group">
@@ -462,6 +464,15 @@ export default function TreatmentPage() {
                                 </div>
                             </>
                         }
+
+                        <div className="form-group">
+                            <label>Dátum</label>
+                            <input
+                                type="date"
+                                value={treatmentDate}
+                                onChange={(e) => setTreatmentDate(e.target.value)}
+                            />
+                        </div>
 
                         <div className="form-group">
                             <label>Megjegyzés</label>
