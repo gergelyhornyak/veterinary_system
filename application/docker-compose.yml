@@ -54,6 +54,7 @@ services:
     environment:
       TZ: Europe/Budapest
       HOST: ${HOST}
+      MONGODB_SYSTEM_LOG_VERBOSITY: 0
     ports:
       - "27017:27017"
     volumes:

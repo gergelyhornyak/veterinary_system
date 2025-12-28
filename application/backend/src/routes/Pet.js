@@ -103,12 +103,18 @@ router.post("/:pid/update/info", async (req, res) => {
 
 router.post("/:pid/update/record", async (req, res) => {
   try {
+    console.log("Debug: Received request to update pet record");
     const { pid } = req.params;
     const { newRecordID } = req.body;
     const pet = await Pet.findOne({pid:pid});
-    if (!pet) return res.status(401).json({error:"Pet not found"});
+    console.log("Debug: Updating record for PID:", pid, "with newRecordID:", newRecordID);  
+    if (!pet) {
+        console.log(`Debug: Pet with PID ${pid} not found in DB`);
+        return res.status(404).json({error: "Pet not found"});
+    }
     // add no changes detected section
     pet.record.push(newRecordID);
+    console.log("Debug: New record added. Total records now:", pet.record);
     await pet.save();
     res.status(200).json({message: "Pet updated successfully", pid: pet.pid});
   } catch (err) {
