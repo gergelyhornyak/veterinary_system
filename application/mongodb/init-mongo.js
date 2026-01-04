@@ -801,3 +801,49 @@ db.drugs.insertMany(
     { value: "SENSPERT FIV-FELV TESZT", label: "SENSPERT FIV-FELV TESZT" }
   ]
 );
+
+db.species.insertMany([
+    { value: 'kutya', label: 'kutya' },
+    { value: 'macska', label: 'macska', },
+    { value: 'nyúl', label: 'nyúl', },
+    { value: 'hörcsög', label: 'hörcsög', },
+    { value: 'görény', label: 'görény', },
+    { value: 'tengerimalac', label: 'tengerimalac', },
+    { value: 'teknős', label: 'teknős', },
+    { value: 'szárnyas', label: 'szárnyas', }
+]);
+
+db.breeds.insertMany([
+    { value: 'keverék', label: 'keverék', species: 'kutya' },
+    { value: 'német juhász', label: 'német juhász', species: 'kutya' },
+    { value: 'labrador', label: 'labrador', species: 'kutya' },
+    { value: 'yorkshire terrier', label: 'yorkshire terrier', species: 'kutya' },
+    { value: 'golden retriever', label: 'golden retriever', species: 'kutya' },
+    { value: 'bernipásztor', label: 'bernipásztor', species: 'kutya' },
+    { value: 'vizsla', label: 'vizsla', species: 'kutya' },
+    { value: 'whippet', label: 'whippet', species: 'kutya' },
+    { value: 'brit rövidszőrű', label: 'brit rövidszőrű', species: 'macska' },
+    { value: 'házi', label: 'házi', species: 'macska' },
+    { value: 'keverék', label: 'keverék', species: 'macska' },
+    { value: 'sziámi', label: 'sziámi', species: 'macska' },
+    { value: 'dalmata', label: 'dalmata', species: 'kutya' },
+    { value: 'maine coon', label: 'maine coon', species: 'macska' },
+    { value: 'holland törpenyúl', label: 'holland törpenyúl', species: 'nyúl' },
+    { value: 'törpenyúl', label: 'törpenyúl', species: 'nyúl' },
+    { value: 'törpehörcsög', label: 'törpehörcsög', species: 'hörcsög' },
+]);
+
+db.colours.insertMany([
+  { value: 'barna', label: 'barna' },
+  { value: 'sárga', label: 'sárga', },
+  { value: 'fehér', label: 'fehér', },
+  { value: 'fekete', label: 'fekete', },
+  { value: 'trikolor', label: 'trikolor', },
+  { value: 'bézs', label: 'bézs', },
+  { value: 'pöttyös', label: 'pöttyös', },
+  { value: 'szürke', label: 'szürke', },
+  { value: 'fóka', label: 'fóka', },
+  { value: 'foltos', label: 'foltos', },
+  { value: 'csíkos', label: 'csíkos', },
+  { value: 'krémszínű', label: 'krémszínű', },
+]);

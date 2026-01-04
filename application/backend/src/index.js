@@ -8,6 +8,7 @@ import petRoutes from "./routes/Pet.js";
 import recordRoutes from "./routes/Record.js";
 import drugRoutes from "./routes/Drug.js";
 import photoRoutes from "./routes/Photo.js";
+import formRoutes from "./routes/Form.js";
 
 import { connectDB } from "./config/db.js";
 
@@ -51,8 +52,7 @@ app.use("/pet", petRoutes);
 app.use("/drug", drugRoutes);
 app.use("/record", recordRoutes);
 app.use("/photo", photoRoutes);
-
-
+app.use("/form", formRoutes);
 
 app.get("/", (req, res) => res.json({ status: "ok", service: "backend"}));
 

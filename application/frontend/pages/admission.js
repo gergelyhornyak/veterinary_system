@@ -45,83 +45,20 @@ export default function AdmissionPage() {
     const [petPhoto, setPetPhoto] = useState(null);
     const [petPhotoPreview, setPetPhotoPreview] = useState(null);
 
-    const [speciesSuggestions, setSpeciesSuggestions] = useState([]);
-    const [dogBreedSuggestions, setDogBreedSuggestions] = useState([]);
     const [selectedSpecies, setSelectedSpecies] = useState([]);
     const [selectedBreeds, setSelectedBreeds] = useState([]);
     const [selectedColours, setSelectedColours] = useState([]);
+
+    const [colourSuggestions, setColourSuggestions] = useState([]);
+    const [speciesSuggestions, setSpeciesSuggestions] = useState([]);
+    const [breedSuggestions, setBreedSuggestions] = useState([]);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const [saving1, setSaving1] = useState(false);
     const [saving2, setSaving2] = useState(false);
 
     const [petCache, setPetCache] = useState([]);
-
-    const speciesOptions = [
-        { value: 'kutya', label: 'kutya' },
-        { value: 'macska', label: 'macska', },
-        { value: 'nyúl', label: 'nyúl', },
-        { value: 'hörcsög', label: 'hörcsög', },
-        { value: 'görény', label: 'görény', },
-        { value: 'tengerimalac', label: 'tengerimalac', },
-        { value: 'teknős', label: 'teknős', },
-        { value: 'sertés', label: 'sertés', },
-    ];
-
-    const breedOptionsMap = {
-        kutya: [
-            { value: 'keverék', label: 'keverék', },
-            { value: 'labrador', label: 'labrador' },
-            { value: 'német juhász', label: 'német juhász', },
-            { value: 'golden retriever', label: 'golden retriever', },
-            { value: 'puli', label: 'puli', },
-            { value: 'beagle', label: 'beagle', },
-            { value: 'bulldog', label: 'bulldog', },
-            { value: 'husky', label: 'husky', },
-            { value: 'tacskó', label: 'tacskó', },
-            { value: 'rottweiler', label: 'rottweiler' },
-            { value: 'border collie', label: 'border collie' },
-            { value: 'vizsla', label: 'vizsla' },
-        ],
-        macska: [
-            { value: 'keverék', label: 'keverék', },
-            { value: 'házi', label: 'házi' },
-            { value: 'sziámi', label: 'sziámi' },
-            { value: 'maine coon', label: 'maine coon', },
-            { value: 'ragdoll', label: 'ragdoll', },
-            { value: 'orosz kék', label: 'orosz kék', },
-        ],
-        nyúl: [
-            { value: 'keverék', label: 'keverék', },
-            { value: 'holland lop', label: 'holland lop' },
-            { value: 'rex', label: 'rex', },
-            { value: 'lengyel', label: 'lengyel', },
-            { value: 'európai', label: 'európai', },
-
-        ],
-        tengerimalac: [
-            { value: 'keverék', label: 'keverék', },
-        ],
-        teknős: [
-            { value: 'keverék', label: 'keverék', },
-        ],
-        sertés: [
-            { value: 'keverék', label: 'keverék', },
-        ],
-    };
-    const colourOptions = [
-        { value: 'barna', label: 'barna' },
-        { value: 'sárga', label: 'sárga', },
-        { value: 'fehér', label: 'fehér', },
-        { value: 'fekete', label: 'fekete', },
-        { value: 'trikolor', label: 'trikolor', },
-        { value: 'bézs', label: 'bézs', },
-        { value: 'pöttyös', label: 'pöttyös', },
-        { value: 'szürke', label: 'szürke', },
-        { value: 'fóka', label: 'fóka', },
-        { value: 'foltos', label: 'foltos', },
-        { value: 'csíkos', label: 'csíkos', },
-    ];
-    const breedOptions = breedOptionsMap[selectedSpecies?.value] || [];
 
     useEffect(() => {
         console.debug("URL args:", uid, existingowner);
@@ -134,6 +71,30 @@ export default function AdmissionPage() {
             setOwnerFullName(name || "");
             setExistingOwnerSubmit("Új tulajdonoshoz új állat(ok) felvétele");
         }
+        const fetchSpeciesSuggestions = async () => {
+            try {
+                const res = await axios.get(`${apiUrl()}/form/species`, { withCredentials: true });
+                setSpeciesSuggestions(res.data || []);
+            } catch (err) {
+                console.error("Error fetching species suggestions:", err);
+            }
+        };
+        const fetchBreedSuggestions = async () => {
+            try {
+                const res = await axios.get(`${apiUrl()}/form/breeds`, { withCredentials: true });
+                setBreedSuggestions(res.data || []);
+            } catch (err) {
+                console.error("Error fetching breed suggestions:", err);
+            }
+        };
+        const fetchColourSuggestions = async () => {
+            try {
+                const res = await axios.get(`${apiUrl()}/form/colours`, { withCredentials: true });
+                setColourSuggestions(res.data || []);
+            } catch (err) {
+                console.error("Error fetching colour suggestions:", err);
+            }
+        };
 
         const fetchOwnerAndPetsData = async () => {
             try {
@@ -163,6 +124,9 @@ export default function AdmissionPage() {
         } else {
             setExistingOwner(false);
         }
+        fetchSpeciesSuggestions();
+        fetchBreedSuggestions();
+        fetchColourSuggestions();
     }, [uid, existingowner, name]);
 
 
@@ -179,20 +143,11 @@ export default function AdmissionPage() {
         }
     };
 
-    const handleChangeChipID = (e) => {
-        let value = e.target.value.replace(/\D/g, ""); // remove non-digits
-        value = value.slice(0, 15); // max 15 digits
-
-        // insert hyphens every 4 digits
-        let formatted = value.match(/.{1,4}/g)?.join("-") || "";
-        setPetChipID(formatted);
-    };
-
     const formatDateForDisplay = (isoDate) => {
-  if (!isoDate) return "";
-  const date = new Date(isoDate);
-  return new Intl.DateTimeFormat("hu-HU").format(date); // e.g. 2025. 10. 27.
-};
+        if (!isoDate) return "";
+        const date = new Date(isoDate);
+        return new Intl.DateTimeFormat("hu-HU").format(date); // e.g. 2025. 10. 27.
+    };
 
     const handleAddPet = (e) => {
         e.preventDefault();
@@ -318,6 +273,45 @@ export default function AdmissionPage() {
         }
     };
 
+    const handleColourCreate = async (inputValue) => {
+        setIsLoading(true);
+        const response = await axios.post(`${apiUrl()}/form/add`, { type: "colour", value: inputValue }, { withCredentials: true });
+
+        if (response.status === 201) {
+            setSelectedColours((prev) => [...prev, {label: inputValue, value: inputValue}]);
+            setColourSuggestions((prev) => [...prev, {label: inputValue, value: inputValue}]);
+        }
+        setIsLoading(false);
+    };
+
+    const handleBreedCreate = async (inputValue) => {
+        console.log("Creating new breed:", inputValue, "for species:", selectedSpecies.value);
+        setIsLoading(true);
+        const response = await axios.post(`${apiUrl()}/form/add`, { type: "breed", value: inputValue, species: selectedSpecies.value}, { withCredentials: true });
+
+        if (response.status === 201) {
+            console.log("Created new breed:", inputValue);
+            setSelectedBreeds((prev) => [...prev, {label: inputValue, value: inputValue}]);
+            setBreedSuggestions((prev) => [...prev, {label: inputValue, value: inputValue}]);
+        }
+        setIsLoading(false);
+    };
+
+    const handleSpeciesCreate = async (inputValue) => {
+        setIsLoading(true);
+        const response = await axios.post(`${apiUrl()}/form/add`, { type: "species", value: inputValue }, { withCredentials: true });
+
+        if (response.status === 201) {
+            console.log("Created new species:", inputValue);
+            setSelectedSpecies({label: inputValue, value: inputValue});
+            setSpeciesSuggestions((prev) => [...prev, {label: inputValue, value: inputValue}]);
+        }
+        setIsLoading(false);
+    };
+
+    const breedOptions = breedSuggestions
+        .filter(b => b.species === selectedSpecies?.value)
+        .map(b => ({ value: b.value, label: b.label }));
 
     return (
         <div>
@@ -378,23 +372,24 @@ export default function AdmissionPage() {
                             </div>
                             <div>
                                 <label><span style={{ "color": "crimson" }}>*</span> Faj</label>
-                                <Select
+                                <CreatableSelect
                                     value={selectedSpecies}
                                     onChange={(option) => {
                                         setSelectedSpecies(option);
                                         setSelectedBreeds([]); // reset breeds when species changes
                                     }}
-                                    defaultValue={[speciesOptions[0]]}
+                                    defaultValue={null}
                                     name="species"
-                                    options={speciesOptions}
+                                    options={speciesSuggestions}
                                     className="basic-multi-select"
                                     classNamePrefix="select"
                                     placeholder="..."
+                                    onCreateOption={handleSpeciesCreate}
                                 />
                             </div>
                             <div>
                                 <label><span style={{ "color": "crimson" }}>*</span> Fajta</label>
-                                <Select
+                                <CreatableSelect
                                     defaultValue={[]}
                                     isMulti
                                     name="breed"
@@ -405,6 +400,7 @@ export default function AdmissionPage() {
                                     classNamePrefix="select"
                                     placeholder="..."
                                     isDisabled={!selectedSpecies}
+                                    onCreateOption={handleBreedCreate}
                                 />
                             </div>
                             <div>
@@ -415,11 +411,12 @@ export default function AdmissionPage() {
                                     name="colour"
                                     value={selectedColours}
                                     onChange={setSelectedColours}
-                                    options={colourOptions}
+                                    options={colourSuggestions}
                                     className="basic-multi-select"
                                     classNamePrefix="select"
                                     placeholder="..."
                                     isDisabled={!selectedSpecies}
+                                    onCreateOption={handleColourCreate}
                                 />
                             </div>
                             <div>
@@ -488,7 +485,7 @@ export default function AdmissionPage() {
                                 <input
                                     type="text"
                                     value={petChipID}
-                                    onChange={handleChangeChipID}
+                                    onChange={setPetChipID}
                                     placeholder="chip szám"
                                 />
                             </div>
